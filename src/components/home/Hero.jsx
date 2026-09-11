@@ -56,13 +56,27 @@ const Hero = ({ onReady }) => {
   // duration/dimensions are known, not that a frame can actually be seeked
   // and drawn yet, which is what previously caused the canvas to get stuck
   // showing only the very first frame.
+  //
+  // Both videos are also fetched into memory first and played from local
+  // blob: URLs rather than the network path. Without this, every
+  // scroll-driven `currentTime` seek in render() below (fired on
+  // basically every animation frame while scrolling) forces the browser
+  // to issue a fresh HTTP range request for the bytes at that timestamp —
+  // and since the next frame immediately seeks again, each request gets
+  // aborted before it finishes, producing a request storm instead of
+  // smooth scrubbing. Seeking into an in-memory blob is instant and needs
+  // no network at all.
+  const logoBlobUrlRef = useRef(null);
+  const heroBlobUrlRef = useRef(null);
+
   useEffect(() => {
     const logoVideo = logoVideoRef.current;
     const heroVideo = heroVideoRef.current;
     if (!logoVideo || !heroVideo) return;
+    let cancelled = false;
 
-    let logoReady = logoVideo.readyState >= 2;
-    let heroReady = heroVideo.readyState >= 2;
+    let logoReady = false;
+    let heroReady = false;
 
     const checkReady = () => {
       if (logoReady && heroReady) {
@@ -80,14 +94,33 @@ const Hero = ({ onReady }) => {
     const onLogoData = () => { logoReady = true; checkReady(); };
     const onHeroData = () => { heroReady = true; checkReady(); };
 
-    if (logoReady) checkReady();
-    else logoVideo.addEventListener('loadeddata', onLogoData);
-    if (heroReady) checkReady();
-    else heroVideo.addEventListener('loadeddata', onHeroData);
+    const loadAsBlob = (src, video, onData, blobUrlRef, fallbackSrc) => {
+      fetch(src)
+        .then((res) => res.blob())
+        .then((blob) => {
+          if (cancelled) return;
+          const url = URL.createObjectURL(blob);
+          blobUrlRef.current = url;
+          video.addEventListener('loadeddata', onData, { once: true });
+          video.src = url;
+          video.load();
+        })
+        .catch((err) => {
+          console.error('Failed to preload video, falling back to direct src', err);
+          video.addEventListener('loadeddata', onData, { once: true });
+          video.src = fallbackSrc;
+        });
+    };
+
+    loadAsBlob(logoVideoSrc, logoVideo, onLogoData, logoBlobUrlRef, logoVideoSrc);
+    loadAsBlob(homeHeroVideoSrc, heroVideo, onHeroData, heroBlobUrlRef, homeHeroVideoSrc);
 
     return () => {
+      cancelled = true;
       logoVideo.removeEventListener('loadeddata', onLogoData);
       heroVideo.removeEventListener('loadeddata', onHeroData);
+      if (logoBlobUrlRef.current) { URL.revokeObjectURL(logoBlobUrlRef.current); logoBlobUrlRef.current = null; }
+      if (heroBlobUrlRef.current) { URL.revokeObjectURL(heroBlobUrlRef.current); heroBlobUrlRef.current = null; }
     };
   }, []);
 
@@ -321,7 +354,6 @@ const Hero = ({ onReady }) => {
             layout (not display:none) so browsers don't suspend decoding. */}
         <video
           ref={logoVideoRef}
-          src={logoVideoSrc}
           muted
           playsInline
           preload="auto"
@@ -329,7 +361,6 @@ const Hero = ({ onReady }) => {
         />
         <video
           ref={heroVideoRef}
-          src={homeHeroVideoSrc}
           muted
           playsInline
           preload="auto"
