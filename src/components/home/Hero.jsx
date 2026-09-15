@@ -3,9 +3,20 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useLenis } from 'lenis/react';
-const logoVideoSrc = "/assets/logo-opt.mp4";
-const homeHeroVideoSrc = "/assets/home-hero-opt.mp4";
 
+// IMPORTANT: these must be imports, not hardcoded string paths. The files
+// live under src/assets/, so the bundler needs to process them (bundle,
+// hash, emit to the build output) to produce a URL that actually resolves
+// on the deployed site. A plain string like "/assets/logo-opt.mp4" only
+// works if that exact file exists in the public/ folder — it doesn't here,
+// so that request 404s, fetch() still "succeeds" with the error page body,
+// the video never gets real data, `loadeddata` never fires, `logoReady`
+// never flips to true, and the canvas never draws a single frame — a
+// permanent black screen with only the (ungated) "SCROLL" hint visible.
+// Adjust the relative path below to match this file's actual location
+// relative to src/assets/ if it differs in your tree.
+import logoVideoSrc from '../assets/logo-opt.mp4';
+import homeHeroVideoSrc from '../assets/home-hero-opt.mp4';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -89,10 +100,21 @@ const Hero = ({ onReady }) => {
           response = await cache.match(src);
           if (!response) {
             response = await fetch(src);
-            if (response.ok) await cache.put(src, response.clone());
+            // Guard against caching/using a 404 (or other error) response —
+            // without this check, a bad path silently "succeeds" with an
+            // error-page blob instead of real video bytes, and the video
+            // element never fires `loadeddata`, which is exactly what
+            // caused the permanent black screen this fix addresses.
+            if (!response.ok) {
+              throw new Error(`Video request failed: ${response.status} ${response.statusText} for ${src}`);
+            }
+            await cache.put(src, response.clone());
           }
         } else {
           response = await fetch(src);
+          if (!response.ok) {
+            throw new Error(`Video request failed: ${response.status} ${response.statusText} for ${src}`);
+          }
         }
         if (cancelled) return;
         const blob = await response.blob();
