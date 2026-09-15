@@ -3,8 +3,9 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useLenis } from 'lenis/react';
-import logoVideoSrc from '../../assets/logo-opt.mp4';
-import homeHeroVideoSrc from '../../assets/home-hero-opt.mp4';
+const logoVideoSrc = "/assets/logo-opt.mp4";
+const homeHeroVideoSrc = "/assets/home-hero-opt.mp4";
+
 
 gsap.registerPlugin(ScrollTrigger);
 
