@@ -15,8 +15,8 @@ import { useLenis } from 'lenis/react';
 // permanent black screen with only the (ungated) "SCROLL" hint visible.
 // Adjust the relative path below to match this file's actual location
 // relative to src/assets/ if it differs in your tree.
-import logoVideoSrc from '../assets/logo-opt.mp4';
-import homeHeroVideoSrc from '../assets/home-hero-opt.mp4';
+import logoVideoSrc from '../../assets/logo-opt.mp4';
+import homeHeroVideoSrc from '../../assets/home-hero-opt.mp4';
 
 gsap.registerPlugin(ScrollTrigger);
 
