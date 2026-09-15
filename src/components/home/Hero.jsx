@@ -3,8 +3,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useLenis } from 'lenis/react';
-import logoVideoSrc from '../../assets/logo.mp4';
-import homeHeroVideoSrc from '../../assets/home-hero.mp4';
+import logoVideoSrc from '../../assets/logo-opt.mp4';
+import homeHeroVideoSrc from '../../assets/home-hero-opt.mp4';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,12 +27,14 @@ const contents = [
   paragraphWords: c.paragraph.split(' '),
 }));
 
-// `onReady` fires once the hero videos have actually decoded a real,
+// `onReady` fires once the logo video has actually decoded a real,
 // drawable frame — not just once metadata is known. Pass this down from
 // the parent (e.g. App.jsx / HomePage.jsx) and wire it to whatever flips
-// LoadingScreen's `ready` prop to true. Without something calling this,
-// LoadingScreen has no way to know the hero is actually ready and its
-// progress bar will sit at 90% forever.
+// LoadingScreen's `ready` prop to true.
+//
+// NOTE: initial readiness is gated on the LOGO video only, since that's
+// the only one shown before any scrolling happens. The hero (engineering)
+// video loads in the background afterwards and is swapped in once ready.
 const Hero = ({ onReady }) => {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
@@ -41,7 +43,8 @@ const Hero = ({ onReady }) => {
   const [activeTextIndex, setActiveTextIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [showText, setShowText] = useState(false);
-  const [videosReady, setVideosReady] = useState(false);
+  const [logoReady, setLogoReady] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
   const [revealedWordCount, setRevealedWordCount] = useState(0);
   const hasAutoPlayed = useRef(false);
   const isAutoScrolling = useRef(false);
@@ -51,21 +54,23 @@ const Hero = ({ onReady }) => {
   const onReadyFiredRef = useRef(false);
   const lenis = useLenis();
 
-  // Wait for both source videos to have actual frame data ready (not just
-  // metadata) before wiring up ScrollTrigger — readyState 1 only confirms
-  // duration/dimensions are known, not that a frame can actually be seeked
-  // and drawn yet, which is what previously caused the canvas to get stuck
-  // showing only the very first frame.
+  // Load both source videos as in-memory blobs so that scroll-driven
+  // `currentTime` seeks in render() below (fired on basically every
+  // animation frame while scrolling) are instant and need no network —
+  // seeking into a network-backed <video> on every frame would otherwise
+  // issue a fresh HTTP range request per seek, each aborted before it
+  // finishes, producing a request storm instead of smooth scrubbing.
   //
-  // Both videos are also fetched into memory first and played from local
-  // blob: URLs rather than the network path. Without this, every
-  // scroll-driven `currentTime` seek in render() below (fired on
-  // basically every animation frame while scrolling) forces the browser
-  // to issue a fresh HTTP range request for the bytes at that timestamp —
-  // and since the next frame immediately seeks again, each request gets
-  // aborted before it finishes, producing a request storm instead of
-  // smooth scrubbing. Seeking into an in-memory blob is instant and needs
-  // no network at all.
+  // Videos are first checked against the Cache Storage API before being
+  // fetched over the network — on repeat visits this avoids re-downloading
+  // the same bytes even if the browser's regular HTTP cache gets evicted,
+  // so returning visitors don't pay the download cost again.
+  //
+  // The two videos are not loaded in lockstep. The LOGO video is what's
+  // visible immediately, so only it blocks initial readiness. The HERO
+  // video loads in the background right after and swaps in silently once
+  // ready — by the time the user has scrolled (or auto-play has run) past
+  // the logo intro, it's almost always ready.
   const logoBlobUrlRef = useRef(null);
   const heroBlobUrlRef = useRef(null);
 
@@ -75,44 +80,52 @@ const Hero = ({ onReady }) => {
     if (!logoVideo || !heroVideo) return;
     let cancelled = false;
 
-    let logoReady = false;
-    let heroReady = false;
-
-    const checkReady = () => {
-      if (logoReady && heroReady) {
-        // Some browsers only fully activate frame decoding after an actual
-        // play() call, even muted+instantly paused — without this,
-        // drawImage(video, ...) can keep showing the very first frame no
-        // matter what currentTime is set to.
-        Promise.all([
-          logoVideo.play().then(() => logoVideo.pause()).catch(() => {}),
-          heroVideo.play().then(() => heroVideo.pause()).catch(() => {}),
-        ]).finally(() => setVideosReady(true));
+    const loadAsBlob = async (src, video, onData, blobUrlRef, fallbackSrc) => {
+      try {
+        let response;
+        if ('caches' in window) {
+          const cache = await caches.open('jova-hero-videos-v1');
+          response = await cache.match(src);
+          if (!response) {
+            response = await fetch(src);
+            if (response.ok) await cache.put(src, response.clone());
+          }
+        } else {
+          response = await fetch(src);
+        }
+        if (cancelled) return;
+        const blob = await response.blob();
+        if (cancelled) return;
+        const url = URL.createObjectURL(blob);
+        blobUrlRef.current = url;
+        video.addEventListener('loadeddata', onData, { once: true });
+        video.src = url;
+        video.load();
+      } catch (err) {
+        console.error('Failed to preload video, falling back to direct src', err);
+        if (cancelled) return;
+        video.addEventListener('loadeddata', onData, { once: true });
+        video.src = fallbackSrc;
       }
     };
 
-    const onLogoData = () => { logoReady = true; checkReady(); };
-    const onHeroData = () => { heroReady = true; checkReady(); };
-
-    const loadAsBlob = (src, video, onData, blobUrlRef, fallbackSrc) => {
-      fetch(src)
-        .then((res) => res.blob())
-        .then((blob) => {
-          if (cancelled) return;
-          const url = URL.createObjectURL(blob);
-          blobUrlRef.current = url;
-          video.addEventListener('loadeddata', onData, { once: true });
-          video.src = url;
-          video.load();
-        })
-        .catch((err) => {
-          console.error('Failed to preload video, falling back to direct src', err);
-          video.addEventListener('loadeddata', onData, { once: true });
-          video.src = fallbackSrc;
-        });
+    // Some browsers only fully activate frame decoding after an actual
+    // play() call, even muted+instantly paused — without this,
+    // drawImage(video, ...) can keep showing the very first frame no
+    // matter what currentTime is set to.
+    const primeAndMark = (video, setReady) => {
+      video.play().then(() => video.pause()).catch(() => {}).finally(() => setReady(true));
     };
 
+    const onLogoData = () => primeAndMark(logoVideo, setLogoReady);
+    const onHeroData = () => primeAndMark(heroVideo, setHeroReady);
+
+    // Kick off the logo load first and immediately — it's the priority.
     loadAsBlob(logoVideoSrc, logoVideo, onLogoData, logoBlobUrlRef, logoVideoSrc);
+
+    // Start the hero load right after, in the background. It does not
+    // block anything — logoReady alone is enough to show the hero section
+    // and start rendering/scrolling.
     loadAsBlob(homeHeroVideoSrc, heroVideo, onHeroData, heroBlobUrlRef, homeHeroVideoSrc);
 
     return () => {
@@ -125,7 +138,7 @@ const Hero = ({ onReady }) => {
   }, []);
 
   useGSAP(() => {
-    if (!videosReady) return;
+    if (!logoReady) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -133,14 +146,19 @@ const Hero = ({ onReady }) => {
     const heroVideo = heroVideoRef.current;
 
     const logoDuration = logoVideo.duration || 0;
-    const heroDuration = heroVideo.duration || 0;
+    // Hero may not be loaded yet — treat it as 0 duration until it is.
+    // We rebuild this whole effect (via the `heroReady` dependency below)
+    // once the hero video actually finishes loading, at which point
+    // heroDuration will be correct and ScrollTrigger gets recreated with
+    // the real totalDuration.
+    const heroDuration = heroReady ? (heroVideo.duration || 0) : 0;
     // Logo intro plays through ~35% faster relative to scroll/auto-scroll
     // time than before — the hero (engineering) video's pacing is
     // completely untouched. Tune LOGO_SPEED if it needs to be more/less.
     const LOGO_SPEED = 2;
     const logoEffectiveDuration = logoDuration / LOGO_SPEED;
     const totalDuration = logoEffectiveDuration + heroDuration;
-    if (totalDuration === 0) return;
+    if (logoEffectiveDuration === 0) return;
 
     let activeVideo = logoVideo;
 
@@ -157,6 +175,15 @@ const Hero = ({ onReady }) => {
     // its own timeline (seconds).
     const render = (overallTime) => {
       const introFinished = overallTime >= logoEffectiveDuration;
+
+      // If the sequence has moved past the logo but the hero video isn't
+      // ready yet, hold on the logo's last frame instead of trying to
+      // draw an unready/zero-duration video.
+      if (introFinished && !heroReady) {
+        drawVideoFrame(logoVideo);
+        return introFinished;
+      }
+
       const video = introFinished ? heroVideo : logoVideo;
       // Logo: overallTime runs through the compressed (faster) timeline,
       // so scale back up to the video's real currentTime. Hero: untouched,
@@ -174,9 +201,8 @@ const Hero = ({ onReady }) => {
     };
 
     // Render first frame immediately, then fire the exact readiness signal
-    // App.jsx is listening for — until now nothing ever dispatched this,
-    // so LoadingScreen always fell through to App.jsx's 6-second failsafe
-    // instead of finishing as soon as the hero was actually ready.
+    // App.jsx is listening for. We only need the logo frame drawable to
+    // consider the page "ready" to show.
     render(0);
     if (!onReadyFiredRef.current) {
       onReadyFiredRef.current = true;
@@ -193,7 +219,7 @@ const Hero = ({ onReady }) => {
     const updateFrame = (overallTime) => {
       const introFinished = render(overallTime);
 
-      if (!introFinished) {
+      if (!introFinished || !heroReady) {
         setShowText(false);
         setIsFinished(false);
       } else {
@@ -223,9 +249,10 @@ const Hero = ({ onReady }) => {
       // Let the Header's side dock know once the JOVA logo intro has
       // played through, so it knows when to activate. Only dispatched
       // on change, not every frame.
-      if (introFinished !== introDoneRef.current) {
-        introDoneRef.current = introFinished;
-        window.dispatchEvent(new CustomEvent('jova-intro-status', { detail: { done: introFinished } }));
+      const effectiveIntroFinished = introFinished && heroReady;
+      if (effectiveIntroFinished !== introDoneRef.current) {
+        introDoneRef.current = effectiveIntroFinished;
+        window.dispatchEvent(new CustomEvent('jova-intro-status', { detail: { done: effectiveIntroFinished } }));
       }
     };
     updateFrameRef.current = updateFrame;
@@ -243,13 +270,20 @@ const Hero = ({ onReady }) => {
     });
     scrollTriggerRef.current = st;
 
-  }, { scope: containerRef, dependencies: [videosReady] });
+    // Once hero finishes loading after this effect already ran on
+    // logoReady alone, `heroReady` flips and this whole effect re-runs
+    // (see dependencies below), tearing down this ScrollTrigger/tween and
+    // building a fresh one with the correct totalDuration. Refresh here
+    // so any layout/pin calculations pick up the new end value cleanly.
+    ScrollTrigger.refresh();
+
+  }, { scope: containerRef, dependencies: [logoReady, heroReady] });
 
   // One scroll (wheel tick / touch swipe / key press) while at the very top
   // auto-plays the whole pinned sequence to the end of the logo intro,
   // instead of requiring the user to manually scroll through all 400dvh.
   useEffect(() => {
-    if (!videosReady) return;
+    if (!logoReady) return;
 
     const triggerAutoPlay = () => {
       if (hasAutoPlayed.current || isAutoScrolling.current) return;
@@ -261,7 +295,12 @@ const Hero = ({ onReady }) => {
       isAutoScrolling.current = true;
 
       const logoDuration = logoVideoRef.current.duration || 0;
-      const heroDuration = heroVideoRef.current.duration || 0;
+      // If the hero video hasn't finished loading yet by the time the user
+      // triggers auto-play, fall back to just the logo's duration — the
+      // updateFrame/render logic above already knows to hold on the last
+      // logo frame until heroReady flips, so this just avoids a
+      // zero-length auto-play tween.
+      const heroDuration = heroReady ? (heroVideoRef.current.duration || 0) : 0;
       const LOGO_SPEED = 2; // must match the value in the main render effect above
       const logoEffectiveDuration = logoDuration / LOGO_SPEED;
       const totalDuration = logoEffectiveDuration + heroDuration;
@@ -342,7 +381,7 @@ const Hero = ({ onReady }) => {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [lenis, videosReady]);
+  }, [lenis, logoReady, heroReady]);
 
   return (
     <section ref={containerRef} id="home" className="relative w-full h-[400dvh] bg-black">
