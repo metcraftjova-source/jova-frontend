@@ -1,5 +1,7 @@
 import React from "react";
 import Hero from "../components/home/Hero";
+import IntroMessage from "../components/home/IntroMessage";
+import AudienceStrip from "../components/home/AudienceStrip";
 import AboutSection from "../components/home/AboutSection";
 // import FeaturedProjects from "../components/home/FeaturedProjects";
 import CoreCapabilities from "../components/home/CoreCapabilities";
@@ -14,6 +16,8 @@ const Home = () => {
   return (
     <main>
       <Hero />
+      <IntroMessage />
+      <AudienceStrip />
       <AboutSection />
       {/* <FeaturedProjects /> */}
       <IndustriesAndTech />

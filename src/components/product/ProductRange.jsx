@@ -1,16 +1,19 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useLenis } from 'lenis/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
 import ShapeGrid from '../ShapeGrid';
 import AnimatedGlassIcon from './icons/AnimatedGlassIcon';
 import {
-  SolidAluminumIcon,
-  InsulatedMetalIcon,
-  StandingSeamIcon,
-  CassettePanelIcon,
-  CorrugatedPanelIcon,
-  PerforatedPanelIcon
+  PerforatedPanelIcon,
+  TrainPlatformDoorIcon,
+  FixedPanelIcon,
+  AluminiumMetalDoorIcon,
+  InteriorCladdingIcon,
+  CurvedAluminiumProfileIcon,
+  CustomAssemblyIcon
 } from './icons/FacadeIcons';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -18,51 +21,93 @@ gsap.registerPlugin(ScrollTrigger);
 const products = [
   {
     id: '01',
-    title: 'Solid Aluminum Wall Panels',
-    description: 'High-strength, non-combustible solid aluminum panels offering exceptional durability and a sleek, flat aesthetic for modern architecture.',
+    slug: 'train-platform-doors',
+    title: 'Train Platform Doors',
+    description: 'Precision-fabricated door systems with structural sealant application and project-specific assemblies for rail and metro platforms.',
     image: '/assets/solid_aluminum_1784535395272.png',
-    icon: <SolidAluminumIcon className="w-full h-full" />
+    icon: <TrainPlatformDoorIcon className="w-full h-full" />
   },
   {
     id: '02',
-    title: 'Insulated Metal Wall Panels (IMP)',
-    description: 'Advanced composite panels providing superior thermal efficiency, moisture control, and rapid installation in a single component.',
+    slug: 'fixed-panels',
+    title: 'Fixed Panels',
+    description: 'Precision-fabricated panel systems with structural sealant application, engineered for project-specific platform and façade assemblies.',
     image: '/assets/insulated_metal_1784535405781.png',
-    icon: <InsulatedMetalIcon className="w-full h-full" />
+    icon: <FixedPanelIcon className="w-full h-full" />
   },
   {
     id: '03',
-    title: 'Standing Seam Wall Panels',
-    description: 'Distinctive vertical shadow lines with concealed fasteners, offering exceptional weather resistance and architectural character.',
+    slug: 'aluminium-metal-doors',
+    title: 'Aluminium & Metal Doors',
+    description: 'Durable, precision-engineered aluminium and metal door systems built for demanding commercial and industrial environments.',
     image: '/assets/standing_seam_1784535461444.png',
-    icon: <StandingSeamIcon className="w-full h-full" />
+    icon: <AluminiumMetalDoorIcon className="w-full h-full" />
   },
   {
     id: '04',
-    title: 'Cassette Panel Systems',
-    description: 'Precision-folded metal cassettes engineered for invisible fixing, allowing for perfectly flat, large-scale modular facades.',
+    slug: 'interior-cladding',
+    title: 'Interior Cladding',
+    description: 'Decorative and functional metal cladding systems that elevate interior walls, feature walls and ceilings with a refined finish.',
     image: '/assets/cassette_panel_1784535497827.png',
-    icon: <CassettePanelIcon className="w-full h-full" />
+    icon: <InteriorCladdingIcon className="w-full h-full" />
   },
   {
     id: '05',
-    title: 'Corrugated / Trapezoidal Metal Panels',
-    description: 'Economical and robust profiled sheets that deliver structural rigidity and dynamic light interplay for industrial and commercial exteriors.',
-    image: '/assets/corrugated_metal_1784535514187.png',
-    icon: <CorrugatedPanelIcon className="w-full h-full" />
+    slug: 'decorative-panels',
+    title: 'Decorative & Perforated Panels',
+    description: 'Custom hole patterns and decorative profiles that bring solar shading, acoustic control and visual character to any elevation.',
+    image: '/assets/perforated_metal_1784535530626.png',
+    icon: <PerforatedPanelIcon className="w-full h-full" />
   },
   {
     id: '06',
-    title: 'Perforated Metal Façade Panels',
-    description: 'Customizable hole patterns providing solar shading, acoustic control, and stunning visual permeability to transform any building envelope.',
-    image: '/assets/perforated_metal_1784535530626.png',
-    icon: <PerforatedPanelIcon className="w-full h-full" />
+    slug: 'curved-aluminium-profiles',
+    title: 'Curved Aluminium Profiles',
+    description: 'Rolled and formed aluminium profiles engineered to precise curvature for distinctive architectural and façade geometries.',
+    image: '/assets/corrugated_metal_1784535514187.png',
+    icon: <CurvedAluminiumProfileIcon className="w-full h-full" />
+  },
+  {
+    id: '07',
+    slug: 'custom-architectural-assemblies',
+    title: 'Custom Architectural Metal Assemblies',
+    description: 'Bespoke, project-specific metal assemblies engineered and fabricated to meet unique architectural and structural requirements.',
+    image: '/assets/solid_aluminum_1784535395272.png',
+    icon: <CustomAssemblyIcon className="w-full h-full" />
   }
 ];
 
 const ProductRange = () => {
   const sectionRef = useRef(null);
   const gridRef = useRef(null);
+  const { hash } = useLocation();
+  const lenis = useLenis();
+  const [highlightedSlug, setHighlightedSlug] = useState(null);
+
+  // Scroll to and briefly highlight the matching card when arriving via a
+  // Products submenu link, e.g. '/products#fixed-panels'.
+  useEffect(() => {
+    if (!hash) return;
+    const slug = hash.replace('#', '');
+    const timer = setTimeout(() => {
+      const element = document.getElementById(slug);
+      if (!element) return;
+      setHighlightedSlug(slug);
+      if (lenis) {
+        lenis.scrollTo(element, {
+          offset: -100,
+          duration: 1.5,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+        });
+      } else {
+        const y = element.getBoundingClientRect().top + window.pageYOffset - 100;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+      const removeTimer = setTimeout(() => setHighlightedSlug(null), 3000);
+      return () => clearTimeout(removeTimer);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [hash, lenis]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -125,11 +170,11 @@ const ProductRange = () => {
       <div className="section-header flex flex-col items-center justify-center text-center mb-24 relative z-10">
         <div className="flex items-center space-x-4 mb-6">
           <div className="h-[1px] w-12 bg-[#ff5c00]"></div>
-          <span className="text-[#ff5c00] font-bold tracking-widest text-sm uppercase">Our Systems</span>
+          <span className="text-[#ff5c00] font-bold tracking-widest text-sm uppercase">Specialised Products</span>
           <div className="h-[1px] w-12 bg-[#ff5c00]"></div>
         </div>
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white max-w-3xl leading-tight">
-          Architectural Solutions for <br/> <span className="text-gray-500 font-light">Every Vision</span>
+          Products That Deserve <br/> <span className="text-gray-500 font-light">Dedicated Visibility</span>
         </h2>
       </div>
 
@@ -138,7 +183,10 @@ const ProductRange = () => {
         {products.map((product, i) => (
           <div 
             key={product.id} 
-            className="product-card group relative h-[500px] w-full rounded-2xl overflow-hidden cursor-pointer bg-[#050505] shadow-2xl"
+            id={product.slug}
+            className={`product-card group relative h-[500px] w-full rounded-2xl overflow-hidden cursor-pointer bg-[#050505] shadow-2xl transition-all duration-500 ${
+              highlightedSlug === product.slug ? 'ring-2 ring-[#ff5c00] scale-[1.02] z-10' : ''
+            }`}
           >
             {/* Background Image */}
             <div className="absolute inset-0 z-0">

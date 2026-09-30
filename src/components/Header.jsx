@@ -4,6 +4,7 @@ import logoShield from '../assets/JM Logo Shield BGR.png';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
   const [introDone, setIntroDone] = useState(false);
   const [isScrollIdle, setIsScrollIdle] = useState(true);
   const location = useLocation();
@@ -50,6 +51,7 @@ const Header = () => {
   // Auto-close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setOpenSubmenu(null);
   }, [location.pathname]);
 
   const isActive = (path) => location.pathname === path;
@@ -63,6 +65,39 @@ const Header = () => {
     `flex items-center gap-2 hover:text-[var(--bronze)] transition-colors pb-4 border-b border-gray-100 ${
       isActive(path) ? 'text-[var(--bronze)]' : 'text-gray-800'
     }`;
+
+  const mobileNavItems = [
+    { to: '/', label: 'Home' },
+    { to: '/about', label: 'About' },
+    {
+      to: '/capabilities',
+      label: 'Capabilities',
+      children: [
+        { to: '/capabilities#engineering-design', label: 'Engineering & Design' },
+        { to: '/capabilities#architectural-interior', label: 'Architectural & Interior' },
+        { to: '/capabilities#facade', label: 'Façade' },
+        { to: '/capabilities#precision-fabrication', label: 'Precision Fabrication' },
+        { to: '/capabilities#structural-steel', label: 'Structural Steel' },
+        { to: '/capabilities#surface-treatment', label: 'Surface Treatment' },
+      ]
+    },
+    {
+      to: '/products',
+      label: 'Products',
+      children: [
+        { to: '/products#train-platform-doors', label: 'Train Platform Doors' },
+        { to: '/products#fixed-panels', label: 'Fixed Panels' },
+        { to: '/products#aluminium-metal-doors', label: 'Aluminium & Metal Doors' },
+        { to: '/products#interior-cladding', label: 'Interior Cladding' },
+        { to: '/products#decorative-panels', label: 'Decorative Panels' },
+        { to: '/products#curved-aluminium-profiles', label: 'Curved Aluminium Profiles' },
+      ]
+    },
+    { to: '/projects', label: 'Projects' },
+    { to: '/industries', label: 'Industries' },
+    { to: '/quality', label: 'Quality' },
+    { to: '/contact', label: 'Contact' },
+  ];
 
   return (
     <>
@@ -101,27 +136,51 @@ const Header = () => {
             </button>
           </div>
 
-          <nav className="flex flex-col space-y-6 text-lg font-bold tracking-wide">
-            <Link to="/" className={mobileNavLinkClass('/')}>
-              {isActive('/') && <span className="w-1.5 h-1.5 rounded-full bg-[var(--bronze)] shrink-0" />}
-              Home
-            </Link>
-            <Link to="/about" className={mobileNavLinkClass('/about')}>
-              {isActive('/about') && <span className="w-1.5 h-1.5 rounded-full bg-[var(--bronze)] shrink-0" />}
-              About
-            </Link>
-            <Link to="/Product" className={mobileNavLinkClass('/Product')}>
-              {isActive('/Product') && <span className="w-1.5 h-1.5 rounded-full bg-[var(--bronze)] shrink-0" />}
-              Product
-            </Link>
-            <Link to="/services" className={mobileNavLinkClass('/services')}>
-              {isActive('/services') && <span className="w-1.5 h-1.5 rounded-full bg-[var(--bronze)] shrink-0" />}
-              Services
-            </Link>
-            <Link to="/contact" className={mobileNavLinkClass('/contact')}>
-              {isActive('/contact') && <span className="w-1.5 h-1.5 rounded-full bg-[var(--bronze)] shrink-0" />}
-              Contact
-            </Link>
+          <nav className="flex flex-col space-y-6 text-lg font-bold tracking-wide overflow-y-auto">
+            {mobileNavItems.map((item) => {
+              const hasChildren = !!item.children?.length;
+              const isOpen = openSubmenu === item.label;
+              return (
+                <div key={item.label} className="flex flex-col">
+                  <div className={mobileNavLinkClass(item.to)}>
+                    {isActive(item.to) && <span className="w-1.5 h-1.5 rounded-full bg-[var(--bronze)] shrink-0" />}
+                    <Link to={item.to} className="flex-1" onClick={() => !hasChildren && setIsMobileMenuOpen(false)}>
+                      {item.label}
+                    </Link>
+                    {hasChildren && (
+                      <button
+                        type="button"
+                        aria-label={`Toggle ${item.label} submenu`}
+                        onClick={() => setOpenSubmenu(isOpen ? null : item.label)}
+                        className="p-1 text-gray-500"
+                      >
+                        <svg
+                          className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+
+                  {hasChildren && isOpen && (
+                    <div className="flex flex-col pl-4 pt-3 gap-3 text-sm font-medium text-gray-600">
+                      {item.children.map((child) => (
+                        <a
+                          key={child.label}
+                          href={child.to}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="hover:text-[var(--bronze)] transition-colors"
+                        >
+                          {child.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </nav>
 
           <div className="mt-auto">

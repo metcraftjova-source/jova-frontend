@@ -71,7 +71,7 @@ const ExperienceScene = ({ containerRef }) => {
 
 
     const grayColor = new THREE.Color('#4a5568');
-    const neonBlue = new THREE.Color('#3BA7FF');
+    const neonBlue = new THREE.Color('#FF6B00');
 
     // Initialize wires to gray
     wires.forEach(w => {
@@ -415,7 +415,7 @@ export default function ExperienceManager() {
           <h1 className="text-anim text-5xl sm:text-7xl md:text-[5.5rem] font-black text-[#e2e8f0] leading-[1.05] tracking-tight uppercase mb-8 drop-shadow-2xl font-sans">
             PRECISION <br />
             SHEET METAL & <br />
-            <span className="text-[#3BA7FF] drop-shadow-[0_0_15px_rgba(59,167,255,0.4)]">
+            <span className="text-[#FF6B00] drop-shadow-[0_0_15px_rgba(255,107,0,0.4)]">
               FACADES.
             </span>
           </h1>
@@ -455,12 +455,12 @@ export default function ExperienceManager() {
 
       {/* SECTION 2: Fabrication */}
       <div className="sect-2 absolute inset-y-0 left-0 z-10 pointer-events-none flex flex-col justify-center px-8 md:px-16 max-w-[700px]">
-        <div className="text-anim opacity-0 translate-y-10 w-16 h-[3px] bg-sky-400 mb-5 ml-1"></div>
+        <div className="text-anim opacity-0 translate-y-10 w-16 h-[3px] bg-orange-400 mb-5 ml-1"></div>
         <h2 className="text-anim opacity-0 translate-y-10 text-[4rem] font-black text-white leading-[0.95] tracking-tight mb-5 drop-shadow-xl font-sans">
           STANDARD <br />
           <span className="text-gray-200">FABRICATION</span>
         </h2>
-        <div className="text-anim opacity-0 translate-y-10 w-12 h-[2px] bg-sky-500 mb-6 ml-1 opacity-80"></div>
+        <div className="text-anim opacity-0 translate-y-10 w-12 h-[2px] bg-orange-500 mb-6 ml-1 opacity-80"></div>
         <p className="text-anim opacity-0 translate-y-10 text-[#a0aab5] text-[13px] leading-[1.8] mb-10 max-w-[420px] font-sans font-medium tracking-wide">
           Our CNC machining and bending processes ensure exact specifications for every panel.
         </p>
@@ -522,7 +522,7 @@ export default function ExperienceManager() {
               {/* Inner dark circle */}
               <div className="w-full h-full bg-[#111827] rounded-full shadow-[inset_0_4px_10px_rgba(0,0,0,0.5)] flex items-center justify-center relative">
                 {/* Inner gradient ball */}
-                <div id="palette-inner-ball" className="w-20 h-20 rounded-full bg-[radial-gradient(circle_at_30%_30%,#38bdf8,#0369a1)] shadow-lg transition-all duration-300"></div>
+                <div id="palette-inner-ball" className="w-20 h-20 rounded-full bg-[radial-gradient(circle_at_30%_30%,#FF7A00,#B34700)] shadow-lg transition-all duration-300"></div>
                 {/* White small selection dot inside */}
                 <div className="absolute top-[30%] right-[30%] w-2 h-2 border-[1.5px] border-white rounded-full"></div>
               </div>

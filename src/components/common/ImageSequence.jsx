@@ -182,23 +182,23 @@ export default function ImageSequenceHero() {
 
       {/* Initial Overlay Content */}
       <div ref={textRef} className="absolute inset-y-0 left-[10%] flex flex-col justify-center pointer-events-none z-10">
-        <div className="w-12 h-1 bg-[#3BA7FF] mb-6"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mb-6"></div>
         <h2 className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight uppercase leading-[1.1] font-sans drop-shadow-lg">
           Precision <br />
           Sheet Metal <br />
           & Facades
         </h2>
-        <div className="w-12 h-1 bg-[#3BA7FF] mt-6"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mt-6"></div>
       </div>
 
       {/* Text 2 */}
       <div ref={text2Ref} className="absolute inset-y-0 left-[10%] flex flex-col justify-center pointer-events-none z-10 opacity-0">
-        <div className="w-12 h-1 bg-[#3BA7FF] mb-6"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mb-6"></div>
         <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase leading-[1.1] font-sans mb-6 drop-shadow-lg">
           Standard <br />
           Fabrication
         </h2>
-        <div className="w-12 h-1 bg-[#3BA7FF] mb-8"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mb-8"></div>
         <p className="text-white text-sm md:text-base mb-8 max-w-md font-normal leading-relaxed" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.7)' }}>
         We transform raw mterials into high-performance engineering solutions through advanced fabrication techniques and skilled craftsmanship.
         </p>
@@ -207,7 +207,7 @@ export default function ImageSequenceHero() {
 
       {/* Text 3 */}
       <div ref={text3Ref} className="absolute top-[35%] left-[10%] flex flex-col pointer-events-none z-10 opacity-0">
-        <div className="w-12 h-1 bg-[#3BA7FF] mb-6"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mb-6"></div>
         <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase leading-[1.1] font-sans mb-6 drop-shadow-lg">
           Premium Coating <br />
           & Finishing

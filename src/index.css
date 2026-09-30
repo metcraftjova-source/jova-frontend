@@ -4,6 +4,21 @@
   :root {
     --gradient-color: #8350e8;
     --sparkles-color: #ffffff;
+
+    /* Metallic silver / aluminium palette — the neutral tone family used
+       everywhere instead of plain grey, so panels, borders, dividers and
+       secondary text read as brushed metal rather than flat UI grey.
+       #FF6B00 (orange) remains the one Jova accent colour on top of this. */
+    --metal-50:  #F5F6F7;
+    --metal-100: #E7E9EC;
+    --metal-200: #D3D7DC;
+    --metal-300: #B9BFC6;
+    --metal-400: #9AA1AA;
+    --metal-500: #7B828C;
+    --metal-600: #5C6169;
+    --metal-700: #3F434A;
+    --metal-800: #292B30;
+    --metal-900: #1A1B1E;
   }
 }
 
@@ -15,6 +30,45 @@
 
   .animate-marquee-lr:hover {
     animation-play-state: paused;
+  }
+
+  /* Brushed-aluminium text: use on large headings/labels that aren't the
+     accent colour, instead of flat white/grey. */
+  .text-metallic {
+    background: linear-gradient(
+      100deg,
+      var(--metal-300) 0%,
+      var(--metal-50) 35%,
+      var(--metal-400) 55%,
+      var(--metal-100) 75%,
+      var(--metal-300) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Metallic hairline divider (replaces flat grey/white dividers). */
+  .divider-metallic {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--metal-400) 50%,
+      transparent
+    );
+  }
+
+  /* Brushed-aluminium panel background, for cards/icon buttons that were
+     flat charcoal, giving a subtle metal sheen instead. */
+  .bg-metallic-panel {
+    background: linear-gradient(
+      160deg,
+      var(--metal-800) 0%,
+      var(--metal-900) 45%,
+      var(--metal-700) 100%
+    );
+    border: 1px solid var(--metal-600);
   }
 }
 

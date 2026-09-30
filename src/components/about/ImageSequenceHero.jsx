@@ -13,17 +13,44 @@ export default function ImageSequenceHero() {
   const textRef = useRef(null);
   const [videoReady, setVideoReady] = useState(false);
   const playhead = useRef({ t: 0 });
+  const blobUrlRef = useRef(null);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (video.readyState >= 1) {
-      setVideoReady(true);
-      return;
-    }
-    const onMeta = () => setVideoReady(true);
-    video.addEventListener('loadedmetadata', onMeta);
-    return () => video.removeEventListener('loadedmetadata', onMeta);
+    let cancelled = false;
+
+    // Fetch the whole file into memory once, then point the <video> at a
+    // local blob: URL. Without this, every scroll-driven `currentTime`
+    // seek below (fired on basically every animation frame while
+    // scrubbing) forces the browser to issue a fresh HTTP range request
+    // for the video bytes at that timestamp — and since the next frame
+    // immediately seeks again, each request gets aborted before it
+    // finishes. That's a request storm, not smooth scrubbing. Seeking
+    // into an in-memory blob is instant and needs no network at all.
+    fetch(aboutHeroVideoSrc)
+      .then((res) => res.blob())
+      .then((blob) => {
+        if (cancelled) return;
+        const url = URL.createObjectURL(blob);
+        blobUrlRef.current = url;
+        video.src = url;
+        video.addEventListener('loadedmetadata', () => setVideoReady(true), { once: true });
+        video.load();
+      })
+      .catch((err) => {
+        console.error('Failed to preload hero video, falling back to direct src', err);
+        video.src = aboutHeroVideoSrc;
+        video.addEventListener('loadedmetadata', () => setVideoReady(true), { once: true });
+      });
+
+    return () => {
+      cancelled = true;
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
   }, []);
 
   const text2Ref = useRef(null);
@@ -123,7 +150,6 @@ export default function ImageSequenceHero() {
     <div ref={containerRef} className="relative w-full h-dvh bg-[#050B16] overflow-hidden">
       <video
         ref={videoRef}
-        src={aboutHeroVideoSrc}
         muted
         playsInline
         preload="auto"
@@ -136,23 +162,23 @@ export default function ImageSequenceHero() {
 
       {/* Initial Overlay Content */}
       <div ref={textRef} className="absolute inset-y-0 left-[10%] flex flex-col justify-center pointer-events-none z-10">
-        <div className="w-12 h-1 bg-[#3BA7FF] mb-6"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mb-6"></div>
         <h2 className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight uppercase leading-[1.1] font-sans drop-shadow-lg">
           Precision <br />
           Sheet Metal <br />
           & Facades
         </h2>
-        <div className="w-12 h-1 bg-[#3BA7FF] mt-6"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mt-6"></div>
       </div>
 
       {/* Text 2 */}
       <div ref={text2Ref} className="absolute inset-y-0 left-[10%] flex flex-col justify-center pointer-events-none z-10 opacity-0">
-        <div className="w-12 h-1 bg-[#3BA7FF] mb-6"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mb-6"></div>
         <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase leading-[1.1] font-sans mb-6 drop-shadow-lg">
           Standard <br />
           Fabrication
         </h2>
-        <div className="w-12 h-1 bg-[#3BA7FF] mb-8"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mb-8"></div>
         <p className="text-white text-sm md:text-base mb-8 max-w-md font-normal leading-relaxed" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.7)' }}>
         We transform raw mterials into high-performance engineering solutions through advanced fabrication techniques and skilled craftsmanship.
         </p>
@@ -161,7 +187,7 @@ export default function ImageSequenceHero() {
 
       {/* Text 3 */}
       <div ref={text3Ref} className="absolute top-[35%] left-[10%] flex flex-col pointer-events-none z-10 opacity-0">
-        <div className="w-12 h-1 bg-[#3BA7FF] mb-6"></div>
+        <div className="w-12 h-1 bg-[#FF6B00] mb-6"></div>
         <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase leading-[1.1] font-sans mb-6 drop-shadow-lg">
           Premium Coating <br />
           & Finishing

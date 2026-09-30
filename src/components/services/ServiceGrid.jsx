@@ -6,9 +6,16 @@ import {
   StructuralSteelIcon,
   ShotBlastingIcon,
   IndustrialPaintingIcon,
-  FacadeSolutionsIcon
+  FacadeSolutionsIcon,
+  EngineeringDesignIcon,
+  ArchitecturalInteriorIcon,
+  PrecisionFabricationIcon
 } from './icons/ServiceIllustrations';
 
+// NOTE: only 4 dedicated capability photos ship with this project, so two
+// pairs of cards below reuse the closest-fitting image as a placeholder.
+// Swap in dedicated photography per capability (e.g. an engineering/
+// drafting shot, an architectural interior shot) when available.
 import servicesFabrication from '../../assets/ServiceGrid/Steel Fabrication.png';
 import servicesErection from '../../assets/ServiceGrid/Shot Blasting.png';
 import servicesPeb from '../../assets/ServiceGrid/Industrial Painting & Coating.png';
@@ -16,35 +23,67 @@ import servicesInfrastructure from '../../assets/ServiceGrid/Facade Solutions.pn
 
 const servicesList = [
   {
-    id: '01',
-    title: 'STEEL FABRICATION',
-    description: 'We transform raw metal into precision-engineered components through expert cutting, bending, welding, and assembly. Using advanced machinery and strict quality control, we deliver custom structural steel solutions for industrial, commercial, and architectural projects.',
+    id: 'engineering-design',
+    num: '01',
+    title: 'ENGINEERING & DESIGN',
+    description: '',
+    icon: <EngineeringDesignIcon />,
+    image: servicesPeb,
+    checklist: [
+      'Concept design & development',
+      'Engineering detailing',
+      'Structural calculations',
+      'Shop drawings',
+      'Production / fabrication drawings',
+      'Design coordination',
+      'Manufacturing feasibility',
+      'Technical support',
+      'As-built drawings'
+    ]
+  },
+  {
+    id: 'architectural-interior',
+    num: '02',
+    title: 'ARCHITECTURAL & INTERIOR METALWORK',
+    description: 'Interior cladding, decorative metal panels, feature walls, feature ceilings, perforated panels, laser-cut screens, decorative partitions, louvers, canopies, column cladding, beam cladding and bespoke architectural features.',
+    icon: <ArchitecturalInteriorIcon />,
+    image: servicesInfrastructure,
+    checklist: []
+  },
+  {
+    id: 'facade',
+    num: '03',
+    title: 'FAÇADE SOLUTIONS',
+    description: 'Aluminium façade components, decorative façade cladding, perforated cladding, curved façade elements, feature façades, aluminium fins and louvers, canopies, column and beam cladding and complex façade geometries.',
+    icon: <FacadeSolutionsIcon />,
+    image: servicesInfrastructure,
+    checklist: []
+  },
+  {
+    id: 'precision-fabrication',
+    num: '04',
+    title: 'PRECISION FABRICATION',
+    description: 'Laser cutting, CNC turret punching, press brake bending, power press, rolling, plasma cutting, oxy-fuel cutting, bandsaw cutting, drilling, lathe machining and certified welding.',
+    icon: <PrecisionFabricationIcon />,
+    image: servicesFabrication,
+    checklist: []
+  },
+  {
+    id: 'structural-steel',
+    num: '05',
+    title: 'STRUCTURAL STEEL',
+    description: 'Structural steel, industrial structures, equipment structures, machine frames, platforms, walkways, staircases, support structures, conveyor structures and heavy welded assemblies.',
     icon: <StructuralSteelIcon />,
     image: servicesFabrication,
     checklist: []
   },
   {
-    id: '02',
-    title: 'SHOT BLASTING',
-    description: 'We prepare metal surfaces using high-speed abrasive blasting to remove rust, scale, paint, and contaminants. The result is a clean, uniform finish that ensures stronger coating adhesion and lasting durability.',
+    id: 'surface-treatment',
+    num: '06',
+    title: 'SURFACE TREATMENT',
+    description: 'Powder coating, PVDF painting, shot blasting, epoxy coating, PU coating and industrial painting.',
     icon: <ShotBlastingIcon />,
     image: servicesErection,
-    checklist: []
-  },
-  {
-    id: '03',
-    title: 'INDUSTRIAL PAINTING & COATINGS',
-    description: 'We provide protective and decorative coating solutions that shield metal structures from corrosion and wear. Our industrial-grade paints and precise application deliver lasting durability and a superior finish.',
-    icon: <IndustrialPaintingIcon />,
-    image: servicesPeb,
-    checklist: []
-  },
-  {
-    id: '04',
-    title: 'FACADE SOLUTIONS',
-    description: 'We design and install architectural facades that blend structural strength with visual appeal. Our solutions ensure weather resistance and a refined, professional exterior finish.',
-    icon: <FacadeSolutionsIcon />,
-    image: servicesInfrastructure,
     checklist: []
   }
 ];
@@ -98,6 +137,32 @@ const ServiceGrid = () => {
         }
       }, 100);
       return () => clearTimeout(timer);
+    } else if (hash) {
+      // Direct capability anchors from the nav submenu, e.g.
+      // '#engineering-design', '#facade', '#structural-steel'.
+      const anchorId = hash.replace('#', '');
+      const timer = setTimeout(() => {
+        const element = document.getElementById(anchorId);
+        if (element) {
+          setHighlightedId(anchorId);
+          if (lenis) {
+            lenis.scrollTo(element, {
+              offset: -120,
+              duration: 1.5,
+              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+            });
+          } else {
+            const yOffset = -120;
+            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+          }
+          const removeHighlightTimer = setTimeout(() => {
+            setHighlightedId(null);
+          }, 3000);
+          return () => clearTimeout(removeHighlightTimer);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [hash, lenis]);
 
@@ -129,20 +194,20 @@ const ServiceGrid = () => {
             • OUR SERVICES
           </span>
           <h2 className="text-2xl md:text-4xl lg:text-4xl font-black text-slate-900 tracking-tight mb-2">
-            Engineering Excellence. <span className="text-[#E34A12]">Built to Last.</span>
+            Our Capabilities. <span className="text-[#E34A12]">Built to Last.</span>
           </h2>
           <p className="text-xs md:text-sm text-gray-500 max-w-xl mx-auto leading-relaxed font-medium">
-            We deliver high-quality steel fabrication, industrial construction, and engineering solutions that ensure durability, safety, and long-term value.
+            From engineering and design through to fabrication, façade work and surface treatment — the full range of what Jova Metcraft delivers under one roof.
           </p>
         </div>
 
-        {/* 2x2 Grid Section */}
+        {/* Capability Cards Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {servicesList.map((service) => (
             <div
               key={service.id}
-              id={`service-${service.id}`}
-              className={`group relative bg-white rounded-3xl border transition-all duration-500 overflow-hidden flex flex-col min-h-[320px] h-auto cursor-pointer ${
+              id={service.id}
+              className={`group relative bg-white rounded-3xl border transition-all duration-500 overflow-hidden flex flex-col min-h-[380px] h-auto cursor-pointer ${
                 highlightedId === service.id
                   ? 'highlighted-service-card border-[#E34A12] z-30'
                   : 'border-gray-100/80 hover:border-transparent hover:shadow-[0_20px_50px_rgba(227,74,18,0.08)]'
@@ -164,7 +229,7 @@ const ServiceGrid = () => {
 
               {/* Overlaid ID Number (absolute top-right corner over the image) */}
               <span className="absolute top-6 right-8 lg:top-8 lg:right-10 text-[#F1F3F5] font-black text-5xl lg:text-6xl select-none group-hover:text-[#E34A12]/15 transition-colors duration-500 leading-none z-20">
-                {service.id}
+                {service.num}
               </span>
 
               {/* Top Row: Glass Icon only */}
@@ -187,9 +252,11 @@ const ServiceGrid = () => {
                     <div className="w-10 h-[2.5px] bg-[#E34A12] mt-1.5 mb-3.5"></div>
 
                     {/* Description */}
-                    <p className="text-gray-500 text-[11px] lg:text-xs leading-relaxed font-medium">
-                      {service.description}
-                    </p>
+                    {service.description && (
+                      <p className="text-gray-500 text-[11px] lg:text-xs leading-relaxed font-medium">
+                        {service.description}
+                      </p>
+                    )}
                   </div>
 
                   <div>

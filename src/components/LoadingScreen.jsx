@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import './LoadingScreen.css';
+import { BRAND_STORY } from './home/brandStory';
 
 const LoadingScreen = ({ ready, onComplete }) => {
   const [progress, setProgress] = useState(0);
@@ -70,7 +71,7 @@ const LoadingScreen = ({ ready, onComplete }) => {
         />
       </div>
 
-      <p className="loading-tagline">Precision Engineered Solutions</p>
+      <p className="loading-tagline">Engineered Metal Solutions — {BRAND_STORY.core}</p>
     </div>
   );
 };

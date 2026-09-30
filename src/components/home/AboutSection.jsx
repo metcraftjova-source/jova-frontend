@@ -174,34 +174,36 @@ const AboutSection = () => {
   const sheetsRef = useRef([]);
   const videoRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
 
+  // Autoplay the video (muted, as browsers require) and only run it while visible
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    const tryPlay = () => video.play().catch(() => {});
+    tryPlay();
+
+    const observer = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? tryPlay() : video.pause()),
+      { threshold: 0.25 }
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
+  // Keyboard shortcut: M toggles mute
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Don't trigger if user is typing in an input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-      if (e.code === 'Space') {
-        e.preventDefault();
-        setIsPlaying(prev => {
-          const next = !prev;
-          if (videoRef.current) {
-            next ? videoRef.current.play() : videoRef.current.pause();
-          }
-          return next;
-        });
-      } else if (e.key === 'm' || e.key === 'M') {
-        e.preventDefault();
+      if (e.key === 'm' || e.key === 'M') {
         setIsMuted(prev => {
           const next = !prev;
-          if (videoRef.current) {
-            videoRef.current.muted = next;
-          }
+          if (videoRef.current) videoRef.current.muted = next;
           return next;
         });
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
@@ -257,11 +259,7 @@ const AboutSection = () => {
 
   return (
     <>
-      {/* Cinematic Blur Overlay (Active when video is playing) */}
-      <div
-        className={`fixed inset-0 bg-black/70 backdrop-blur-md z-[60] transition-opacity duration-700 pointer-events-none ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
-      />
-      <section ref={containerRef} id="about" className={`relative w-full bg-black text-white py-24 px-4 md:px-10 flex justify-center overflow-hidden transition-all duration-700 ${isPlaying ? 'z-[65]' : 'z-0'}`}>
+      <section ref={containerRef} id="about" className="relative w-full bg-black text-white py-24 px-4 md:px-10 flex justify-center overflow-hidden">
         <div className="relative flex flex-col lg:flex-row w-full max-w-[1500px] border border-gray-800 rounded-[20px] overflow-hidden bg-[#0d0d0f] min-h-[600px]">
 
           {/* Left Content */}
@@ -305,7 +303,7 @@ const AboutSection = () => {
             </button>
           </div>
 
-          <div className={`relative w-full lg:w-[55%] h-[350px] sm:h-[400px] lg:h-[600px] overflow-hidden group ${isPlaying ? 'z-[70]' : 'z-10'} transition-all duration-700`}>
+          <div className="relative w-full lg:w-[55%] h-[350px] sm:h-[400px] lg:h-[600px] overflow-hidden z-10">
             <div
               className="absolute inset-0 w-full h-full overflow-hidden"
               style={{
@@ -315,42 +313,14 @@ const AboutSection = () => {
               <video
                 ref={videoRef}
                 src={aboutVideo}
-                muted={isMuted}
+                autoPlay
+                muted
                 loop
                 playsInline
+                preload="auto"
                 className="absolute inset-0 w-full h-full object-cover"
               ></video>
             </div>
-
-            {/* Play/Pause Button - Center */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const newPlayingState = !isPlaying;
-                setIsPlaying(newPlayingState);
-                if (videoRef.current) {
-                  if (newPlayingState) {
-                    videoRef.current.play();
-                  } else {
-                    videoRef.current.pause();
-                  }
-                }
-              }}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] bg-black/50 hover:bg-black/70 text-white p-4 md:p-5 rounded-full backdrop-blur-md transition-all duration-300 flex items-center justify-center border border-white/20 cursor-pointer shadow-xl group-hover:opacity-100"
-              aria-label={isPlaying ? "Pause video" : "Play video"}
-            >
-              {isPlaying ? (
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="6" y="4" width="4" height="16"></rect>
-                  <rect x="14" y="4" width="4" height="16"></rect>
-                </svg>
-              ) : (
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1">
-                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-              )}
-            </button>
 
             {/* Mute/Unmute Button - Top Right */}
             <button

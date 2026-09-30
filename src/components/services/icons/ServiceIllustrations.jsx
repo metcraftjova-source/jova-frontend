@@ -260,3 +260,65 @@ export const FacadeSolutionsIcon = () => (
         </g>
     </svg>
 );
+
+export const EngineeringDesignIcon = () => (
+    <svg {...svgProps}>
+        <g className="main fade-fill">
+            {/* Drawing board / blueprint sheet */}
+            <path d="M20 15h45v70H20z" fill={secondary} opacity="0.15" stroke={primary} strokeWidth="4" />
+            <path d="M28 30h29" stroke={primary} strokeWidth="3" />
+            <path d="M28 42h22" stroke={primary} strokeWidth="3" />
+            <path d="M28 54h29" stroke={primary} strokeWidth="3" />
+            <path d="M28 66h16" stroke={primary} strokeWidth="3" />
+        </g>
+        <g className="highlight" stroke={accent} strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            {/* Compass / drafting tool */}
+            <path className="draw-stroke" d="M70 20l14 55" />
+            <path className="draw-stroke" d="M84 75l-20-8" />
+            <circle className="draw-stroke" cx="70" cy="20" r="3" fill={accent} />
+            <circle className="draw-stroke" cx="64" cy="67" r="2" fill={accent} />
+        </g>
+    </svg>
+);
+
+export const ArchitecturalInteriorIcon = () => (
+    <svg {...svgProps}>
+        <g className="main fade-fill">
+            {/* Perforated / cladding panel wall */}
+            <path d="M15 20h70v60H15z" fill={primary} />
+            {[0, 1, 2, 3].map((row) =>
+                [0, 1, 2, 3].map((col) => (
+                    <circle
+                        key={`${row}-${col}`}
+                        cx={28 + col * 16}
+                        cy={33 + row * 14}
+                        r="4"
+                        fill={secondary}
+                    />
+                ))
+            )}
+        </g>
+        <g className="highlight" stroke={accent} strokeWidth="3" fill="none" strokeLinecap="round">
+            {/* Feature louvre accent sweeping across */}
+            <path className="draw-stroke" d="M15 75l70-15" />
+            <circle className="draw-stroke" cx="60" cy="61" r="4" fill={accent} />
+        </g>
+    </svg>
+);
+
+export const PrecisionFabricationIcon = () => (
+    <svg {...svgProps}>
+        <g className="main fade-fill">
+            {/* Metal sheet on a cutting bed */}
+            <path d="M15 60h70v10H15z" fill={primary} />
+            <path d="M15 60h70v3H15z" fill={secondary} />
+        </g>
+        <g className="highlight" stroke={accent} strokeWidth="3" fill="none" strokeLinecap="round">
+            {/* Laser head + beam cutting a curved profile */}
+            <path className="draw-stroke" d="M45 15h10v22H45z" fill={secondary} stroke="none" />
+            <path className="draw-stroke" d="M50 37v20" strokeWidth="4" />
+            <circle className="draw-stroke" cx="50" cy="60" r="3" fill={accent} />
+            <path className="draw-stroke" d="M20 60c10-14 20-14 30 0s20 14 30 0" strokeDasharray="3 4" />
+        </g>
+    </svg>
+);

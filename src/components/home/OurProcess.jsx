@@ -10,18 +10,21 @@ gsap.registerPlugin(ScrollTrigger);
 // early consultation, purple for design, brand orange for manufacturing,
 // green for quality/approval, pink for final delivery.
 const stepColors = [
-  { color: "#38bdf8", hoverColor: "#7dd3fc", glow: "rgba(56,189,248,0.9)" }, // 01 Consultation — blue
-  { color: "#a78bfa", hoverColor: "#c4b5fd", glow: "rgba(167,139,250,0.9)" }, // 02 Design & Planning — purple
-  { color: "#fb923c", hoverColor: "#fdba74", glow: "rgba(251,146,60,0.9)" }, // 03 Precision Manufacturing — orange
-  { color: "#4ade80", hoverColor: "#86efac", glow: "rgba(74,222,128,0.9)" }, // 04 Quality Assurance — green
-  { color: "#f472b6", hoverColor: "#f9a8d4", glow: "rgba(244,114,182,0.9)" }, // 05 Delivery & Installation — pink
+  { color: "#38bdf8", hoverColor: "#7dd3fc", glow: "rgba(56,189,248,0.9)" }, // 01 Concept — blue
+  { color: "#a78bfa", hoverColor: "#c4b5fd", glow: "rgba(167,139,250,0.9)" }, // 02 Engineer — purple
+  { color: "#818cf8", hoverColor: "#a5b4fc", glow: "rgba(129,140,248,0.9)" }, // 03 Design — indigo
+  { color: "#22d3ee", hoverColor: "#67e8f9", glow: "rgba(34,211,238,0.9)" }, // 04 Process — cyan
+  { color: "#fb923c", hoverColor: "#fdba74", glow: "rgba(251,146,60,0.9)" }, // 05 Fabricate — orange
+  { color: "#4ade80", hoverColor: "#86efac", glow: "rgba(74,222,128,0.9)" }, // 06 Inspect — green
+  { color: "#eab308", hoverColor: "#fde047", glow: "rgba(234,179,8,0.9)" }, // 07 Finish — gold
+  { color: "#f472b6", hoverColor: "#f9a8d4", glow: "rgba(244,114,182,0.9)" }, // 08 Deliver — pink
 ];
 
 const processSteps = [
   {
     id: "01",
-    title: " Consultation",
-    desc: "Understanding your project requirements to recommend practical and efficient solutions.",
+    title: "Concept",
+    desc: "Understanding your vision and project requirements to shape a practical, high-performing concept.",
     illustration: true,
     icon: (
       // Two people, full color — a flat vector illustration rather than
@@ -37,8 +40,8 @@ const processSteps = [
   },
   {
     id: "02",
-    title: "Design & Planning",
-    desc: "Developing clear designs and detailed plans to support smooth and efficient project execution.",
+    title: "Engineer",
+    desc: "Developing detailed engineering, architectural design and planning to support flawless execution.",
     illustration: true,
     icon: (
       // Building under a construction crane — full color flat vector
@@ -63,8 +66,49 @@ const processSteps = [
   },
   {
     id: "03",
-    title: "Precision Manufacturing",
-    desc: "Producing high-quality sheet metal and architectural façade solutions using advanced manufacturing processes.",
+    title: "Design",
+    desc: "Preparing shop and production drawings so every part is precisely specified before it reaches the floor.",
+    illustration: true,
+    icon: (
+      // Blueprint / drawing sheet with a ruler and pencil — full color
+      // flat vector illustration.
+      <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="6" width="26" height="34" rx="1.5" fill="#e0e7ff" stroke="#818cf8" strokeWidth="1.5" />
+        <line x1="13" y1="14" x2="29" y2="14" stroke="#6366f1" strokeWidth="1.5" />
+        <line x1="13" y1="19" x2="26" y2="19" stroke="#818cf8" strokeWidth="1.2" />
+        <line x1="13" y1="24" x2="29" y2="24" stroke="#818cf8" strokeWidth="1.2" />
+        <rect x="13" y="29" width="10" height="7" fill="none" stroke="#6366f1" strokeWidth="1.2" />
+        <line x1="13" y1="32.5" x2="23" y2="32.5" stroke="#6366f1" strokeWidth="1" />
+        <g transform="translate(29,26) rotate(35)">
+          <rect x="0" y="0" width="4" height="18" rx="1" fill="#fbbf24" />
+          <path d="M0 18 L2 24 L4 18 Z" fill="#78350f" />
+        </g>
+      </svg>
+    ),
+  },
+  {
+    id: "04",
+    title: "Process",
+    desc: "Cutting, punching, bending and rolling raw material to exact tolerances on advanced production machinery.",
+    illustration: true,
+    icon: (
+      // Laser cutting head over a metal sheet, with a cut line and
+      // sparks — full color flat vector illustration.
+      <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="30" width="36" height="8" rx="1" fill="#94a3b8" />
+        <rect x="6" y="30" width="36" height="3" rx="1" fill="#cbd5e1" />
+        <path d="M10 30 L38 30" stroke="#22d3ee" strokeWidth="1.2" strokeDasharray="2 2" />
+        <rect x="21" y="6" width="6" height="16" rx="1.5" fill="#0e7490" />
+        <path d="M24 22 L24 30" stroke="#22d3ee" strokeWidth="2.5" />
+        <circle cx="24" cy="30" r="2.5" fill="#67e8f9" />
+        <path d="M18 26l-3 -3 M30 26l3 -3 M24 24 l0 -4" stroke="#facc15" strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    id: "05",
+    title: "Fabricate",
+    desc: "Producing high-quality sheet metal and architectural façade solutions through certified welding and assembly.",
     illustration: true,
     icon: (
       // Magnifying glass with a gear inside (precision) and a green
@@ -87,9 +131,9 @@ const processSteps = [
     ),
   },
   {
-    id: "04",
-    title: "Quality Assurance",
-    desc: "Conducting thorough quality checks to ensure durability, accuracy, and consistent performance",
+    id: "06",
+    title: "Inspect",
+    desc: "Conducting thorough quality checks to ensure durability, accuracy, and consistent performance.",
     illustration: true,
     icon: (
       // Shield + check, full color, with a glossy glass-like highlight
@@ -132,9 +176,27 @@ const processSteps = [
     ),
   },
   {
-    id: "05",
-    title: "Delivery & Installation",
-    desc: "Providing timely delivery and professional installation to ensure every project is completed successfully",
+    id: "07",
+    title: "Finish",
+    desc: "Applying premium coatings and surface finishes for lasting protection, colour accuracy and appearance.",
+    illustration: true,
+    icon: (
+      // Paint roller applying a finish coat — full color flat vector
+      // illustration.
+      <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="30" width="3" height="12" fill="#78350f" />
+        <rect x="7.5" y="16" width="2" height="15" fill="#a16207" />
+        <rect x="4" y="10" width="20" height="9" rx="2" fill="#eab308" />
+        <rect x="4" y="10" width="20" height="4" rx="2" fill="#fde047" />
+        <rect x="30" y="20" width="14" height="6" rx="1" fill="#f59e0b" />
+        <rect x="34" y="26" width="6" height="12" fill="#d97706" />
+      </svg>
+    ),
+  },
+  {
+    id: "08",
+    title: "Deliver",
+    desc: "Providing timely delivery and professional installation to ensure every project is completed successfully.",
     illustration: true,
     icon: (
       // Package plus a wrench, installing it — full color flat vector
@@ -294,12 +356,12 @@ const OurProcess = () => {
         {/* Left Title */}
         <div className="process-title flex flex-col items-start w-full xl:w-[25%] flex-shrink-0 relative z-20">
           <span className="text-[#ff6b00] font-bold text-[11px] tracking-widest uppercase mb-4 block">
-            Our Proven Process
+            Our Process
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight text-white">
-            From Vision
+            From an Idea to a
             <br />
-            To <span className="text-[#ff6b00]">Reality</span>
+            <span className="text-[#ff6b00]">Finished Metal Solution.</span>
           </h2>
         </div>
 
@@ -307,7 +369,7 @@ const OurProcess = () => {
         <div className="w-full xl:w-[75%] relative mt-8 xl:mt-0">
           <div className="w-full flex pb-8 relative">
             {/* Animated SVG Timeline Line */}
-            <div className="absolute top-[60px] left-[5%] right-[5%] h-[2px] z-0 pointer-events-none hidden md:block">
+            <div className="absolute top-[60px] left-[5%] right-[5%] h-[2px] z-0 pointer-events-none hidden xl:block">
               <svg
                 width="100%"
                 height="2"
@@ -341,7 +403,7 @@ const OurProcess = () => {
             </div>
 
             <div className="flex-shrink-0 relative px-4 w-full">
-              <div className="flex flex-col md:flex-row justify-between gap-8 md:gap-4 relative z-10 w-full items-center">
+              <div className="flex flex-col md:flex-row md:flex-wrap xl:flex-nowrap justify-center xl:justify-between gap-y-10 gap-x-6 md:gap-x-4 relative z-10 w-full items-start xl:items-center">
                 {processSteps.map((step, index) => (
                   <div
                     key={`process-${step.id}`}

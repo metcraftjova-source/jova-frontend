@@ -167,7 +167,7 @@ export const ReferenceBuilding = ({ sheetsRef, wiresRef, glowRef, buildingGroupR
     // 1. Mouse hover glow logic
     glowRef.current = THREE.MathUtils.lerp(glowRef.current, 0, delta * 0.35);
     const dim = new THREE.Color('#2d3748');
-    const glow = new THREE.Color('#3BA7FF').multiplyScalar(1.7);
+    const glow = new THREE.Color('#FF6B00').multiplyScalar(1.7);
     const cur = dim.clone().lerp(glow, glowRef.current);
 
     buildingGroupRef.current?.traverse((child) => {
@@ -523,41 +523,41 @@ export default function AboutHero() {
       ></div>
 
       {/* Radial Blue Neon glows */}
-      <div className="absolute top-1/2 left-2/3 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#3BA7FF] opacity-[0.08] blur-[150px] pointer-events-none z-0"></div>
-      <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-[#3BA7FF] opacity-[0.05] blur-[120px] pointer-events-none z-0"></div>
+      <div className="absolute top-1/2 left-2/3 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#FF6B00] opacity-[0.08] blur-[150px] pointer-events-none z-0"></div>
+      <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-[#FF6B00] opacity-[0.05] blur-[120px] pointer-events-none z-0"></div>
 
       <div className="relative w-full max-w-[1500px] grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center z-10">
 
         {/* LEFT COLUMN: Typography & Taglines */}
         <div className="lg:col-span-5 flex flex-col items-start text-left">
 
-          <div className="hero-animate inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-500/20 bg-sky-950/20 text-[#3BA7FF] text-xs font-mono font-medium tracking-wider mb-6 backdrop-blur-md shadow-[0_0_15px_rgba(59,167,255,0.1)]">
+          <div className="hero-animate inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-orange-500/20 bg-orange-950/20 text-[#FF6B00] text-xs font-mono font-medium tracking-wider mb-6 backdrop-blur-md shadow-[0_0_15px_rgba(255,107,0,0.1)]">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
             </span>
             FACADE.ENGINE_v1.02
           </div>
 
           <h1 className="hero-animate text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.1] mb-6 tracking-tight font-sans">
-            Precision <br />
-            Sheet Metal & <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-[#3BA7FF] drop-shadow-[0_2px_10px_rgba(59,167,255,0.25)]">
-              Facades.
+            One Partner. <br />
+            From Concept <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-[#FF6B00] drop-shadow-[0_2px_10px_rgba(255,107,0,0.25)]">
+              To Completion.
             </span>
           </h1>
 
           <p className="hero-animate text-gray-400 text-base md:text-lg mb-8 max-w-lg leading-relaxed font-light font-sans">
-            Hover over the screen to trigger the holographic scanner. Witness blueprint wireframe vectors dynamically integrate into rigid, structural sheet metal facades.
+            A premium integrated engineering, architectural and metal manufacturing partner. Hover over the screen to trigger the holographic scanner and watch blueprint vectors resolve into rigid, structural sheet metal facades.
           </p>
 
           {/* Call to Actions */}
           <div className="hero-animate flex flex-wrap gap-4 items-center mb-10 w-full sm:w-auto">
-            <button className="px-8 py-3.5 bg-[#3BA7FF] hover:bg-[#208ae0] text-white font-medium rounded-lg transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(59,167,255,0.3)] hover:shadow-[0_0_30px_rgba(59,167,255,0.5)] transform hover:-translate-y-0.5 cursor-pointer">
+            <button className="px-8 py-3.5 bg-[#FF6B00] hover:bg-[#e65c00] text-white font-medium rounded-lg transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(255,107,0,0.3)] hover:shadow-[0_0_30px_rgba(255,107,0,0.5)] transform hover:-translate-y-0.5 cursor-pointer">
               Launch Compiler
               <Cpu className="w-4 h-4" />
             </button>
-            <button className="px-8 py-3.5 bg-[#050B16]/60 hover:bg-sky-950/20 border border-gray-800 hover:border-sky-500/30 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-300 flex items-center gap-2 backdrop-blur-md cursor-pointer">
+            <button className="px-8 py-3.5 bg-[#050B16]/60 hover:bg-orange-950/20 border border-gray-800 hover:border-orange-500/30 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-300 flex items-center gap-2 backdrop-blur-md cursor-pointer">
               Documentation
               <Layers className="w-4 h-4" />
             </button>
@@ -565,9 +565,9 @@ export default function AboutHero() {
 
           {/* System Metrics Widget */}
           <div className="panel-animate w-full max-w-md p-4 rounded-xl border border-gray-800 bg-[#050B16]/50 backdrop-blur-xl flex flex-col font-mono text-left select-none relative overflow-hidden group shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
-            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-sky-500/20 to-transparent"></div>
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-orange-500/20 to-transparent"></div>
             <div className="flex items-center justify-between border-b border-gray-900 pb-2 mb-3">
-              <div className="flex items-center gap-2 text-xs text-sky-400">
+              <div className="flex items-center gap-2 text-xs text-orange-400">
                 <Terminal className="w-3.5 h-3.5" />
                 <span>SYSTEM_METRICS</span>
               </div>
@@ -591,7 +591,7 @@ export default function AboutHero() {
               </div>
               <div className="flex flex-col p-2 bg-[#0a1122]/40 rounded border border-gray-900">
                 <span className="text-[10px] text-gray-500 uppercase">ACTIVE_GLOW_STATE</span>
-                <span className="text-sky-400 font-bold mt-0.5 flex items-center gap-1">
+                <span className="text-orange-400 font-bold mt-0.5 flex items-center gap-1">
                   DYNAMIC_INTERACTIVE
                 </span>
               </div>
@@ -609,7 +609,7 @@ export default function AboutHero() {
               transform: `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
               transition: 'transform 0.15s ease-out'
             }}
-            className="relative w-full max-w-[640px] h-[400px] sm:h-[450px] rounded-2xl border border-white/10 bg-[#050B16]/40 backdrop-blur-[16px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7),0_0_40px_rgba(59,167,255,0.08)] flex flex-col overflow-hidden z-10"
+            className="relative w-full max-w-[640px] h-[400px] sm:h-[450px] rounded-2xl border border-white/10 bg-[#050B16]/40 backdrop-blur-[16px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7),0_0_40px_rgba(255,107,0,0.08)] flex flex-col overflow-hidden z-10"
           >
             {/* Browser Window Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-[#0a1122]/60 border-b border-white/5 select-none shrink-0">
@@ -680,8 +680,8 @@ export default function AboutHero() {
           </div>
 
           {/* FLOATING CAD PANEL A: Drafting Controls (Top Right) */}
-          <div className="panel-animate absolute top-[-30px] right-[-10px] w-[220px] p-3 rounded-xl border border-sky-500/20 bg-[#050B16]/80 backdrop-blur-xl flex flex-col font-mono text-left select-none z-20 shadow-[0_10px_35px_rgba(0,0,0,0.5)]">
-            <div className="flex items-center gap-1.5 text-[10px] text-sky-400 font-bold border-b border-white/5 pb-1.5 mb-2">
+          <div className="panel-animate absolute top-[-30px] right-[-10px] w-[220px] p-3 rounded-xl border border-orange-500/20 bg-[#050B16]/80 backdrop-blur-xl flex flex-col font-mono text-left select-none z-20 shadow-[0_10px_35px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center gap-1.5 text-[10px] text-orange-400 font-bold border-b border-white/5 pb-1.5 mb-2">
               <Sliders className="w-3 h-3" />
               <span>DRAFTING_CONTROLS</span>
             </div>
@@ -691,18 +691,18 @@ export default function AboutHero() {
               <button
                 onClick={() => setScanMode('auto')}
                 className={`w-full py-1.5 px-2.5 text-[10px] font-bold rounded flex items-center justify-between border transition-all cursor-pointer ${scanMode === 'auto'
-                  ? 'bg-sky-500/20 border-sky-500 text-sky-300'
+                  ? 'bg-orange-500/20 border-orange-500 text-orange-300'
                   : 'bg-white/5 border-white/5 text-gray-500 hover:text-gray-300'
                   }`}
               >
                 <span>AUTO ATTACH</span>
-                <span className="text-[8px] px-1 bg-sky-500/30 text-sky-300 rounded font-normal uppercase">LOOP</span>
+                <span className="text-[8px] px-1 bg-orange-500/30 text-orange-300 rounded font-normal uppercase">LOOP</span>
               </button>
 
               <button
                 onClick={() => setScanMode('wireframe')}
                 className={`w-full py-1.5 px-2.5 text-[10px] font-bold rounded flex items-center justify-between border transition-all cursor-pointer ${scanMode === 'wireframe'
-                  ? 'bg-sky-500/20 border-sky-500 text-sky-300'
+                  ? 'bg-orange-500/20 border-orange-500 text-orange-300'
                   : 'bg-white/5 border-white/5 text-gray-500 hover:text-gray-300'
                   }`}
               >
@@ -713,7 +713,7 @@ export default function AboutHero() {
               <button
                 onClick={() => setScanMode('realistic')}
                 className={`w-full py-1.5 px-2.5 text-[10px] font-bold rounded flex items-center justify-between border transition-all cursor-pointer ${scanMode === 'realistic'
-                  ? 'bg-sky-500/20 border-sky-500 text-sky-300'
+                  ? 'bg-orange-500/20 border-orange-500 text-orange-300'
                   : 'bg-white/5 border-white/5 text-gray-500 hover:text-gray-300'
                   }`}
               >
@@ -726,7 +726,7 @@ export default function AboutHero() {
             <div className="flex flex-col gap-1">
               <div className="flex justify-between text-[8px] text-gray-500 font-bold uppercase">
                 <span>Manual Build</span>
-                <span className="text-sky-400">{sliderPercentage.toFixed(0)}%</span>
+                <span className="text-orange-400">{sliderPercentage.toFixed(0)}%</span>
               </div>
               <input
                 type="range"
@@ -738,14 +738,14 @@ export default function AboutHero() {
                   setScanMode('manual');
                   setManualProgress(parseInt(e.target.value));
                 }}
-                className="w-full accent-sky-500 bg-gray-800 rounded-lg cursor-pointer h-1"
+                className="w-full accent-orange-500 bg-gray-800 rounded-lg cursor-pointer h-1"
               />
             </div>
           </div>
 
           {/* FLOATING CAD PANEL B: Spectrometer & Integrity (Bottom Right) */}
-          <div className="panel-animate absolute bottom-[10px] right-[-20px] w-[240px] p-3 rounded-xl border border-sky-500/20 bg-[#050B16]/80 backdrop-blur-xl flex flex-col font-mono text-left select-none z-20 shadow-[0_10px_35px_rgba(0,0,0,0.5)]">
-            <div className="flex items-center gap-1.5 text-[10px] text-sky-400 font-bold border-b border-white/5 pb-1.5 mb-2.5">
+          <div className="panel-animate absolute bottom-[10px] right-[-20px] w-[240px] p-3 rounded-xl border border-orange-500/20 bg-[#050B16]/80 backdrop-blur-xl flex flex-col font-mono text-left select-none z-20 shadow-[0_10px_35px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center gap-1.5 text-[10px] text-orange-400 font-bold border-b border-white/5 pb-1.5 mb-2.5">
               <Activity className="w-3 h-3" />
               <span>STRESS_INTEGRITY_CHECK</span>
             </div>
@@ -754,30 +754,30 @@ export default function AboutHero() {
               <div className="flex flex-col gap-0.5">
                 <div className="flex justify-between text-[8px] text-gray-500">
                   <span>FACADE_STEEL_TENSION</span>
-                  <span className="text-sky-400 font-bold">98.2%</span>
+                  <span className="text-orange-400 font-bold">98.2%</span>
                 </div>
                 <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-[#3BA7FF] h-full rounded-full w-[98.2%] shadow-[0_0_10px_#3BA7FF]"></div>
+                  <div className="bg-[#FF6B00] h-full rounded-full w-[98.2%] shadow-[0_0_10px_#FF6B00]"></div>
                 </div>
               </div>
 
               <div className="flex flex-col gap-0.5">
                 <div className="flex justify-between text-[8px] text-gray-500">
                   <span>PANEL_ALIGNMENT_TOLERANCE</span>
-                  <span className="text-sky-400 font-bold">99.8%</span>
+                  <span className="text-orange-400 font-bold">99.8%</span>
                 </div>
                 <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-[#3BA7FF] h-full rounded-full w-[99.8%] shadow-[0_0_10px_#3BA7FF]"></div>
+                  <div className="bg-[#FF6B00] h-full rounded-full w-[99.8%] shadow-[0_0_10px_#FF6B00]"></div>
                 </div>
               </div>
 
               <div className="flex flex-col gap-0.5">
                 <div className="flex justify-between text-[8px] text-gray-500">
                   <span>SEGMENT_JOINT_RIGIDITY</span>
-                  <span className="text-sky-400 font-bold">89.1%</span>
+                  <span className="text-orange-400 font-bold">89.1%</span>
                 </div>
                 <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-[#3BA7FF] h-full rounded-full w-[89.1%] shadow-[0_0_10px_#3BA7FF]"></div>
+                  <div className="bg-[#FF6B00] h-full rounded-full w-[89.1%] shadow-[0_0_10px_#FF6B00]"></div>
                 </div>
               </div>
 
@@ -794,9 +794,9 @@ export default function AboutHero() {
           </div>
 
           {/* FLOATING CAD PANEL C: Coordinate Analyzer (Bottom Left) */}
-          <div className="panel-animate absolute bottom-[10px] left-[-30px] w-[210px] p-3 rounded-xl border border-sky-500/20 bg-[#050B16]/80 backdrop-blur-xl flex flex-col font-mono text-left select-none z-20 shadow-[0_10px_35px_rgba(0,0,0,0.5)]">
+          <div className="panel-animate absolute bottom-[10px] left-[-30px] w-[210px] p-3 rounded-xl border border-orange-500/20 bg-[#050B16]/80 backdrop-blur-xl flex flex-col font-mono text-left select-none z-20 shadow-[0_10px_35px_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between border-b border-white/5 pb-1.5 mb-2">
-              <div className="flex items-center gap-1.5 text-[10px] text-sky-400 font-bold">
+              <div className="flex items-center gap-1.5 text-[10px] text-orange-400 font-bold">
                 <Database className="w-3.5 h-3.5" />
                 <span>COORDINATES_LOG</span>
               </div>
@@ -805,7 +805,7 @@ export default function AboutHero() {
                 className={`p-1 rounded hover:bg-white/10 text-gray-500 hover:text-white transition-colors cursor-pointer`}
                 title={isRotating ? "Pause Auto-Orbit" : "Resume Auto-Orbit"}
               >
-                {isRotating ? <Pause className="w-3 h-3 text-sky-400" /> : <Play className="w-3 h-3" />}
+                {isRotating ? <Pause className="w-3 h-3 text-orange-400" /> : <Play className="w-3 h-3" />}
               </button>
             </div>
 
@@ -828,10 +828,10 @@ export default function AboutHero() {
 
             <div className="flex items-center gap-2 border-t border-white/5 pt-2 mt-2 justify-between">
               <div className="flex items-center gap-1 text-[8px] text-gray-500">
-                <Compass className="w-3 h-3 text-sky-500 animate-spin" style={{ animationDuration: '6s' }} />
+                <Compass className="w-3 h-3 text-orange-500 animate-spin" style={{ animationDuration: '6s' }} />
                 <span>XYZ_COMPASS: AUTO</span>
               </div>
-              <span className="text-[8px] text-[#3BA7FF]">UNIT: METERS</span>
+              <span className="text-[8px] text-[#FF6B00]">UNIT: METERS</span>
             </div>
           </div>
 

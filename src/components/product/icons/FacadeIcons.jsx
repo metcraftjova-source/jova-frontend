@@ -209,3 +209,158 @@ export const PerforatedPanelIcon = ({ className }) => (
     </defs>
   </svg>
 );
+
+// 7. Train Platform Doors: two sliding glass leaves framed in an aluminum track
+export const TrainPlatformDoorIcon = ({ className }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <g className="layer-bg">
+      <rect x="10" y="15" width="80" height="6" fill="url(#tpd-grad-track)"/>
+      <rect x="10" y="79" width="80" height="6" fill="url(#tpd-grad-track)"/>
+    </g>
+    <g className="layer-mid">
+      <rect x="16" y="21" width="30" height="58" fill="url(#tpd-grad-glass)"/>
+      <rect x="54" y="21" width="30" height="58" fill="url(#tpd-grad-glass)"/>
+    </g>
+    <g className="layer-fg">
+      <rect x="16" y="21" width="30" height="58" stroke="white" strokeOpacity="0.5" strokeWidth="2" fill="none"/>
+      <rect x="54" y="21" width="30" height="58" stroke="white" strokeOpacity="0.5" strokeWidth="2" fill="none"/>
+      <rect x="44" y="21" width="12" height="58" fill="#ff5c00" opacity="0.85"/>
+      <rect x="16" y="21" width="30" height="14" fill="white" opacity="0.15"/>
+      <rect x="54" y="21" width="30" height="14" fill="white" opacity="0.15"/>
+    </g>
+    <defs>
+      <linearGradient id="tpd-grad-track" x1="10" y1="18" x2="90" y2="18" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.9"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.3"/>
+      </linearGradient>
+      <linearGradient id="tpd-grad-glass" x1="16" y1="21" x2="46" y2="79" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.5"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.1"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+// 8. Fixed Panels: a static, mullioned glazing panel (no operable parts)
+export const FixedPanelIcon = ({ className }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <g className="layer-bg">
+      <rect x="12" y="12" width="76" height="76" rx="2" fill="url(#fp-grad-frame)"/>
+    </g>
+    <g className="layer-mid">
+      <rect x="18" y="18" width="64" height="64" fill="url(#fp-grad-glass)"/>
+      <rect x="48" y="18" width="4" height="64" fill="#ff5c00" opacity="0.8"/>
+      <rect x="18" y="48" width="64" height="4" fill="#ff5c00" opacity="0.8"/>
+    </g>
+    <g className="layer-fg">
+      <rect x="18" y="18" width="30" height="26" fill="white" opacity="0.15"/>
+    </g>
+    <defs>
+      <linearGradient id="fp-grad-frame" x1="12" y1="12" x2="88" y2="88" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.9"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.3"/>
+      </linearGradient>
+      <linearGradient id="fp-grad-glass" x1="18" y1="18" x2="82" y2="82" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.4"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.1"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+// 9. Aluminium & Metal Doors: a paneled door with handle
+export const AluminiumMetalDoorIcon = ({ className }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <g className="layer-bg">
+      <rect x="25" y="10" width="50" height="80" rx="2" fill="url(#amd-grad-door)"/>
+    </g>
+    <g className="layer-mid">
+      <rect x="31" y="16" width="38" height="30" fill="white" opacity="0.12"/>
+      <rect x="31" y="52" width="38" height="30" fill="white" opacity="0.08"/>
+    </g>
+    <g className="layer-fg">
+      <rect x="25" y="10" width="50" height="80" rx="2" stroke="white" strokeOpacity="0.4" strokeWidth="2" fill="none"/>
+      <rect x="64" y="46" width="4" height="10" rx="2" fill="#ff5c00"/>
+    </g>
+    <defs>
+      <linearGradient id="amd-grad-door" x1="25" y1="10" x2="75" y2="90" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.55"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.15"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+// 10. Interior Cladding: overlapping horizontal battens on a wall
+export const InteriorCladdingIcon = ({ className }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <g className="layer-bg">
+      <rect x="12" y="12" width="76" height="76" rx="2" fill="#222222"/>
+    </g>
+    <g className="layer-mid">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <rect key={i} x="18" y={18 + i * 13} width="64" height="9" rx="1.5" fill="url(#ic-grad-batten)"/>
+      ))}
+    </g>
+    <g className="layer-fg">
+      <rect x="18" y="31" width="64" height="9" rx="1.5" fill="#ff5c00" opacity="0.85"/>
+    </g>
+    <defs>
+      <linearGradient id="ic-grad-batten" x1="18" y1="18" x2="82" y2="18" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.7"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.25"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+// 11. Curved Aluminium Profiles: bent/rolled aluminium arc
+export const CurvedAluminiumProfileIcon = ({ className }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <g className="layer-bg">
+      <path d="M15 75 C15 35 85 35 85 75" stroke="url(#cap-grad-bg)" strokeWidth="14" fill="none"/>
+    </g>
+    <g className="layer-mid">
+      <path d="M15 75 C15 35 85 35 85 75" stroke="url(#cap-grad-fg)" strokeWidth="8" fill="none"/>
+    </g>
+    <g className="layer-fg">
+      <path d="M20 70 C20 40 80 40 80 70" stroke="#ff5c00" strokeWidth="2" opacity="0.8" fill="none"/>
+    </g>
+    <defs>
+      <linearGradient id="cap-grad-bg" x1="15" y1="35" x2="85" y2="75" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.25"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.05"/>
+      </linearGradient>
+      <linearGradient id="cap-grad-fg" x1="15" y1="35" x2="85" y2="75" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.9"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.4"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+// 12. Custom Architectural Metal Assemblies: bespoke overlapping modular forms
+export const CustomAssemblyIcon = ({ className }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <g className="layer-bg">
+      <rect x="15" y="45" width="35" height="35" rx="3" fill="url(#ca-grad-a)"/>
+    </g>
+    <g className="layer-mid">
+      <rect x="40" y="30" width="35" height="35" rx="3" fill="url(#ca-grad-b)"/>
+    </g>
+    <g className="layer-fg">
+      <rect x="55" y="55" width="30" height="30" rx="3" fill="#ff5c00" opacity="0.85"/>
+      <rect x="40" y="30" width="35" height="35" rx="3" stroke="white" strokeOpacity="0.3" strokeWidth="1.5" fill="none"/>
+    </g>
+    <defs>
+      <linearGradient id="ca-grad-a" x1="15" y1="45" x2="50" y2="80" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.6"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.15"/>
+      </linearGradient>
+      <linearGradient id="ca-grad-b" x1="40" y1="30" x2="75" y2="65" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#ffffff" stopOpacity="0.8"/>
+        <stop offset="1" stopColor="#ffffff" stopOpacity="0.3"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);

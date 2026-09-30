@@ -3,23 +3,18 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useLenis } from 'lenis/react';
-import logoVideoSrc from '../../assets/logo.mp4';
-import homeHeroVideoSrc from '../../assets/home-hero.mp4';
+import logoVideoSrc from '../../assets/logo-opt.mp4';
+import homeHeroVideoSrc from '../../assets/home-hero-opt.mp4';
+import { BRAND_STORY } from './brandStory';
+import { ArrowRight, FileUp } from 'lucide-react';
+import { openEnquiry } from './enquiry';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const contents = [
   {
-    heading: "ENGINEERING THE FUTURE",
-    paragraph: "Advancing the future of construction with virtual construction, architectural visualization, and innovative engineering solutions designed to improve efficiency, collaboration, and project performance."
-  },
-  {
-    heading: "DEFINING TOMORROW",
-    paragraph: "Driving innovation through advanced construction solutions, precision manufacturing, and modern technologies that deliver sustainable, high-quality outcomes for the built environment."
-  },
-  {
-    heading: "DRIVEN BY INNOVATION",
-    paragraph: "Delivering advanced engineering, precision fabrication, and technology-driven solutions designed to meet the evolving needs of modern construction and infrastructure."
+    heading: "Engineered Metal Solutions.",
+    paragraph: BRAND_STORY.core
   }
 ].map((c) => ({
   ...c,
@@ -27,12 +22,53 @@ const contents = [
   paragraphWords: c.paragraph.split(' '),
 }));
 
-// `onReady` fires once the hero videos have actually decoded a real,
-// drawable frame — not just once metadata is known. Pass this down from
-// the parent (e.g. App.jsx / HomePage.jsx) and wire it to whatever flips
-// LoadingScreen's `ready` prop to true. Without something calling this,
-// LoadingScreen has no way to know the hero is actually ready and its
-// progress bar will sit at 90% forever.
+const capabilityStrip = [
+  'Engineering',
+  'Architectural Metalwork',
+  'Façade Solutions',
+  'Aluminium & Metal Doors',
+  'Precision Fabrication',
+  'Structural Steel',
+  'Surface Treatment'
+];
+
+const processStages = BRAND_STORY.stages; // full 14-stage chain, CONCEPT -> DELIVER
+const PROCESS_STEP_MS = 1500; // 14 stages, so a quicker step keeps one full pass ~21s
+
+// Small self-contained animated process line — cycles through each stage
+// in strict order, looping, highlighting exactly one stage at a time.
+const HeroProcessLine = ({ active }) => {
+  const [activeStage, setActiveStage] = useState(0);
+
+  useEffect(() => {
+    if (!active) return;
+    const id = setInterval(() => {
+      setActiveStage((prev) => (prev + 1) % processStages.length);
+    }, PROCESS_STEP_MS);
+    return () => clearInterval(id);
+  }, [active]);
+
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 max-w-3xl">
+      {processStages.map((stage, i) => (
+        <React.Fragment key={stage}>
+          <span
+            className="text-[10px] sm:text-[11px] tracking-[0.12em] font-semibold uppercase whitespace-nowrap transition-colors duration-700 ease-in-out"
+            style={{
+              color: i === activeStage ? '#FF6B00' : 'rgba(255,255,255,0.45)',
+              textShadow: i === activeStage ? '0 0 12px rgba(255,107,0,0.7)' : 'none'
+            }}
+          >
+            {stage}
+          </span>
+          {i < processStages.length - 1 && (
+            <span className="text-white/30 text-[10px] sm:text-xs">→</span>
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+};
 const Hero = ({ onReady }) => {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
@@ -41,7 +77,8 @@ const Hero = ({ onReady }) => {
   const [activeTextIndex, setActiveTextIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [showText, setShowText] = useState(false);
-  const [videosReady, setVideosReady] = useState(false);
+  const [logoReady, setLogoReady] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
   const [revealedWordCount, setRevealedWordCount] = useState(0);
   const hasAutoPlayed = useRef(false);
   const isAutoScrolling = useRef(false);
@@ -50,24 +87,10 @@ const Hero = ({ onReady }) => {
   const scrollTriggerRef = useRef(null);
   const onReadyFiredRef = useRef(false);
   const lenis = useLenis();
-
-  // Wait for both source videos to have actual frame data ready (not just
-  // metadata) before wiring up ScrollTrigger — readyState 1 only confirms
-  // duration/dimensions are known, not that a frame can actually be seeked
-  // and drawn yet, which is what previously caused the canvas to get stuck
-  // showing only the very first frame.
-  //
-  // Both videos are also fetched into memory first and played from local
-  // blob: URLs rather than the network path. Without this, every
-  // scroll-driven `currentTime` seek in render() below (fired on
-  // basically every animation frame while scrolling) forces the browser
-  // to issue a fresh HTTP range request for the bytes at that timestamp —
-  // and since the next frame immediately seeks again, each request gets
-  // aborted before it finishes, producing a request storm instead of
-  // smooth scrubbing. Seeking into an in-memory blob is instant and needs
-  // no network at all.
   const logoBlobUrlRef = useRef(null);
   const heroBlobUrlRef = useRef(null);
+  const seekersRef = useRef({ logo: null, hero: null });
+  const drawActiveRef = useRef(() => {});
 
   useEffect(() => {
     const logoVideo = logoVideoRef.current;
@@ -75,48 +98,88 @@ const Hero = ({ onReady }) => {
     if (!logoVideo || !heroVideo) return;
     let cancelled = false;
 
-    let logoReady = false;
-    let heroReady = false;
+    // Seeking is asynchronous. Setting currentTime on every scroll tick and
+    // drawing immediately paints the OLD frame, and each new seek aborts the
+    // previous one, so frames get skipped. This seeker keeps only ONE seek in
+    // flight, remembers the latest wanted time, and draws when 'seeked' fires.
+    const makeSeeker = (video) => {
+      let target = null;
+      let busy = false;
+      let busySince = 0;
+      const go = () => {
+        if (target === null) return;
+        const t = target;
+        target = null;
+        if (Math.abs(video.currentTime - t) < 0.001) return;
+        busy = true;
+        busySince = performance.now();
+        video.currentTime = t;
+      };
+      const onSeeked = () => {
+        busy = false;
+        drawActiveRef.current(video);
+        go();
+      };
+      video.addEventListener('seeked', onSeeked);
+      return {
+        request(t) {
+          target = t;
+          if (busy && performance.now() - busySince > 300) busy = false; // safety
+          if (!busy) go();
+        },
+        cancel() { target = null; },
+        destroy() { video.removeEventListener('seeked', onSeeked); },
+      };
+    };
+    seekersRef.current = { logo: makeSeeker(logoVideo), hero: makeSeeker(heroVideo) };
 
-    const checkReady = () => {
-      if (logoReady && heroReady) {
-        // Some browsers only fully activate frame decoding after an actual
-        // play() call, even muted+instantly paused — without this,
-        // drawImage(video, ...) can keep showing the very first frame no
-        // matter what currentTime is set to.
-        Promise.all([
-          logoVideo.play().then(() => logoVideo.pause()).catch(() => {}),
-          heroVideo.play().then(() => heroVideo.pause()).catch(() => {}),
-        ]).finally(() => setVideosReady(true));
+    const loadAsBlob = async (src, video, onData, blobUrlRef, fallbackSrc) => {
+      try {
+        let response;
+        if ('caches' in window) {
+          const cache = await caches.open('jova-hero-videos-v1');
+          response = await cache.match(src);
+          if (!response) {
+            response = await fetch(src);
+            if (!response.ok) {
+              throw new Error(`Video request failed: ${response.status} ${response.statusText} for ${src}`);
+            }
+            await cache.put(src, response.clone());
+          }
+        } else {
+          response = await fetch(src);
+          if (!response.ok) {
+            throw new Error(`Video request failed: ${response.status} ${response.statusText} for ${src}`);
+          }
+        }
+        if (cancelled) return;
+        const blob = await response.blob();
+        if (cancelled) return;
+        const url = URL.createObjectURL(blob);
+        blobUrlRef.current = url;
+        video.addEventListener('loadeddata', onData, { once: true });
+        video.src = url;
+        video.load();
+      } catch (err) {
+        console.error('Failed to preload video, falling back to direct src', err);
+        if (cancelled) return;
+        video.addEventListener('loadeddata', onData, { once: true });
+        video.src = fallbackSrc;
       }
     };
-
-    const onLogoData = () => { logoReady = true; checkReady(); };
-    const onHeroData = () => { heroReady = true; checkReady(); };
-
-    const loadAsBlob = (src, video, onData, blobUrlRef, fallbackSrc) => {
-      fetch(src)
-        .then((res) => res.blob())
-        .then((blob) => {
-          if (cancelled) return;
-          const url = URL.createObjectURL(blob);
-          blobUrlRef.current = url;
-          video.addEventListener('loadeddata', onData, { once: true });
-          video.src = url;
-          video.load();
-        })
-        .catch((err) => {
-          console.error('Failed to preload video, falling back to direct src', err);
-          video.addEventListener('loadeddata', onData, { once: true });
-          video.src = fallbackSrc;
-        });
+    const primeAndMark = (video, setReady) => {
+      video.play().then(() => video.pause()).catch(() => {}).finally(() => setReady(true));
     };
 
+    const onLogoData = () => primeAndMark(logoVideo, setLogoReady);
+    const onHeroData = () => primeAndMark(heroVideo, setHeroReady);
     loadAsBlob(logoVideoSrc, logoVideo, onLogoData, logoBlobUrlRef, logoVideoSrc);
     loadAsBlob(homeHeroVideoSrc, heroVideo, onHeroData, heroBlobUrlRef, homeHeroVideoSrc);
 
     return () => {
       cancelled = true;
+      seekersRef.current.logo?.destroy();
+      seekersRef.current.hero?.destroy();
       logoVideo.removeEventListener('loadeddata', onLogoData);
       heroVideo.removeEventListener('loadeddata', onHeroData);
       if (logoBlobUrlRef.current) { URL.revokeObjectURL(logoBlobUrlRef.current); logoBlobUrlRef.current = null; }
@@ -125,7 +188,7 @@ const Hero = ({ onReady }) => {
   }, []);
 
   useGSAP(() => {
-    if (!videosReady) return;
+    if (!logoReady) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -133,14 +196,11 @@ const Hero = ({ onReady }) => {
     const heroVideo = heroVideoRef.current;
 
     const logoDuration = logoVideo.duration || 0;
-    const heroDuration = heroVideo.duration || 0;
-    // Logo intro plays through ~35% faster relative to scroll/auto-scroll
-    // time than before — the hero (engineering) video's pacing is
-    // completely untouched. Tune LOGO_SPEED if it needs to be more/less.
-    const LOGO_SPEED = 2;
+    const heroDuration = heroReady ? (heroVideo.duration || 0) : 0;
+    const LOGO_SPEED = 1.3; // was 2 — slowed down so the intro doesn't feel rushed
     const logoEffectiveDuration = logoDuration / LOGO_SPEED;
     const totalDuration = logoEffectiveDuration + heroDuration;
-    if (totalDuration === 0) return;
+    if (logoEffectiveDuration === 0) return;
 
     let activeVideo = logoVideo;
 
@@ -155,28 +215,29 @@ const Hero = ({ onReady }) => {
 
     // Render whichever video is currently active, at a given moment within
     // its own timeline (seconds).
-    const render = (overallTime) => {
+    drawActiveRef.current = (v) => { if (v === activeVideo) drawVideoFrame(v); };
+
+    const render = (overallTime, { seek = true } = {}) => {
       const introFinished = overallTime >= logoEffectiveDuration;
+      if (introFinished && !heroReady) {
+        drawVideoFrame(logoVideo);
+        return introFinished;
+      }
+
       const video = introFinished ? heroVideo : logoVideo;
-      // Logo: overallTime runs through the compressed (faster) timeline,
-      // so scale back up to the video's real currentTime. Hero: untouched,
-      // same 1:1 mapping as before.
       const localTime = introFinished
         ? Math.min(overallTime - logoEffectiveDuration, heroDuration)
         : Math.min(overallTime * LOGO_SPEED, logoDuration);
 
       activeVideo = video;
-      // Clamp to avoid seeking past the very end, which some browsers reject
-      video.currentTime = Math.max(0, Math.min(localTime, video.duration - 0.03));
+      if (seek) {
+        const target = Math.max(0, Math.min(localTime, video.duration - 0.03));
+        (video === heroVideo ? seekersRef.current.hero : seekersRef.current.logo)?.request(target);
+      }
       drawVideoFrame(video);
 
       return introFinished;
     };
-
-    // Render first frame immediately, then fire the exact readiness signal
-    // App.jsx is listening for — until now nothing ever dispatched this,
-    // so LoadingScreen always fell through to App.jsx's 6-second failsafe
-    // instead of finishing as soon as the hero was actually ready.
     render(0);
     if (!onReadyFiredRef.current) {
       onReadyFiredRef.current = true;
@@ -185,47 +246,42 @@ const Hero = ({ onReady }) => {
     }
 
     const sequence = { t: 0 };
+    const updateFrame = (overallTime, opts) => {
+      const introFinished = render(overallTime, opts);
 
-    // Everything that needs to happen at a given point in the sequence —
-    // draw the right video frame, decide which heading is active, and how
-    // many of its words are revealed. Shared between the normal
-    // scroll-scrubbed path AND the decoupled auto-play timeline below.
-    const updateFrame = (overallTime) => {
-      const introFinished = render(overallTime);
-
-      if (!introFinished) {
+      if (!introFinished || !heroReady) {
         setShowText(false);
         setIsFinished(false);
       } else {
         setShowText(true);
         const heroProgress = (overallTime - logoEffectiveDuration) / heroDuration;
 
-        if (heroProgress > 0.95) {
-          setIsFinished(true);
-        } else {
-          setIsFinished(false);
+        // The intro ENDS on the fully revealed hero (heading, tagline, capability
+        // strip, CTAs, process line). It never fades out at the end of the video;
+        // the sticky section simply scrolls away naturally afterwards.
+        setIsFinished(false);
 
-          const segment = 1 / contents.length;
-          const rawIndex = Math.min(Math.floor(heroProgress / segment), contents.length - 1);
-          setActiveTextIndex(rawIndex);
-
-          // How far we are through *this heading's* slice — used to
-          // reveal its words one at a time rather than the whole sentence
-          // snapping in at once.
-          const localT = (heroProgress - rawIndex * segment) / segment;
-          const current = contents[rawIndex];
-          const totalWords = current.headingWords.length + current.paragraphWords.length;
-          const count = Math.min(totalWords, Math.ceil(Math.max(0, localT) * totalWords));
-          setRevealedWordCount(count);
-        }
+        const segment = 1 / contents.length;
+        const progress = Math.min(1, Math.max(0, heroProgress));
+        const rawIndex = Math.min(Math.floor(progress / segment), contents.length - 1);
+        setActiveTextIndex(rawIndex);
+        const localT = (progress - rawIndex * segment) / segment;
+        const current = contents[rawIndex];
+        const totalWords = current.headingWords.length + current.paragraphWords.length;
+        // Finish revealing by 60% of the hero video so a skipped frame or a
+        // fast scroll can never leave the last words unrevealed.
+        const REVEAL_END = 0.6;
+        const count = Math.min(
+          totalWords,
+          Math.ceil(Math.min(1, Math.max(0, localT) / REVEAL_END) * totalWords)
+        );
+        // Never let the count go backwards during autoplay (prevents flicker).
+        setRevealedWordCount((prev) => (isAutoScrolling.current ? Math.max(prev, count) : count));
       }
-
-      // Let the Header's side dock know once the JOVA logo intro has
-      // played through, so it knows when to activate. Only dispatched
-      // on change, not every frame.
-      if (introFinished !== introDoneRef.current) {
-        introDoneRef.current = introFinished;
-        window.dispatchEvent(new CustomEvent('jova-intro-status', { detail: { done: introFinished } }));
+      const effectiveIntroFinished = introFinished && heroReady;
+      if (effectiveIntroFinished !== introDoneRef.current) {
+        introDoneRef.current = effectiveIntroFinished;
+        window.dispatchEvent(new CustomEvent('jova-intro-status', { detail: { done: effectiveIntroFinished } }));
       }
     };
     updateFrameRef.current = updateFrame;
@@ -238,18 +294,17 @@ const Hero = ({ onReady }) => {
       animation: gsap.to(sequence, {
         t: totalDuration,
         ease: "none",
-        onUpdate: () => updateFrame(sequence.t),
+        // While the intro autoplays, the video drives the canvas - ignore scroll updates
+        onUpdate: () => { if (!isAutoScrolling.current) updateFrame(sequence.t); },
       })
     });
     scrollTriggerRef.current = st;
+    ScrollTrigger.refresh();
 
-  }, { scope: containerRef, dependencies: [videosReady] });
+  }, { scope: containerRef, dependencies: [logoReady, heroReady] });
 
-  // One scroll (wheel tick / touch swipe / key press) while at the very top
-  // auto-plays the whole pinned sequence to the end of the logo intro,
-  // instead of requiring the user to manually scroll through all 400dvh.
   useEffect(() => {
-    if (!videosReady) return;
+    if (!logoReady) return;
 
     const triggerAutoPlay = () => {
       if (hasAutoPlayed.current || isAutoScrolling.current) return;
@@ -261,48 +316,24 @@ const Hero = ({ onReady }) => {
       isAutoScrolling.current = true;
 
       const logoDuration = logoVideoRef.current.duration || 0;
-      const heroDuration = heroVideoRef.current.duration || 0;
-      const LOGO_SPEED = 2; // must match the value in the main render effect above
+      const heroDuration = heroReady ? (heroVideoRef.current.duration || 0) : 0;
+      const LOGO_SPEED = 1.3; // must match the value in the main render effect above
       const logoEffectiveDuration = logoDuration / LOGO_SPEED;
       const totalDuration = logoEffectiveDuration + heroDuration;
       if (totalDuration === 0) return;
-
-      // Auto-play all the way through the logo intro AND the full hero
-      // sequence — every heading reveals its words one at a time at a
-      // readable pace.
       const targetOverallTime = totalDuration;
       const scrollableHeight = container.offsetHeight - window.innerHeight;
       const targetY = container.offsetTop + scrollableHeight;
 
-      // The page's scroll position and the video's playback are normally
-      // locked together 1:1 (scroll drives the video via ScrollTrigger's
-      // scrub) — so scrolling fast would force the video to blur through
-      // frames too. Instead: move the page to its final position quickly,
-      // and disable the scrub for a moment so it doesn't fight over the
-      // video timeline, while a separate, independent tween plays the
-      // video/text out slowly and readably underneath.
-      const st = scrollTriggerRef.current;
-      if (st) st.disable(false);
+      const scrollDuration = 2.2; 
 
-      const totalWordsAllHeadings = contents.reduce(
-        (sum, c) => sum + c.headingWords.length + c.paragraphWords.length,
-        0
-      );
-      const introPace = Math.max(3.5, 12 * (logoEffectiveDuration / totalDuration));
-      const readingPace = totalWordsAllHeadings * 0.4; // ~400ms/word — genuinely readable
-      const videoDuration = introPace + readingPace;
-
-      const scrollDuration = 2.2; // fast — the page itself should get there quickly
-
+      // NOTE: the ScrollTrigger is intentionally NOT disabled/re-enabled here.
+      // Re-enabling resets its progress to 0 and it then scrubbed 0 -> 1 in
+      // ~0.5s, which rewound the video and flashed all the hero text/CTAs.
       const finishAutoScroll = () => {
         isAutoScrolling.current = false;
-        if (st) {
-          st.enable();
-          ScrollTrigger.refresh();
-        }
       };
 
-      // Fast: just move the page to its final scroll position.
       if (lenis) {
         lenis.scrollTo(targetY, {
           duration: scrollDuration,
@@ -313,16 +344,69 @@ const Hero = ({ onReady }) => {
         window.scrollTo({ top: targetY, behavior: 'smooth' });
       }
 
-      // Slow: the video/text plays out on its own readable timeline,
-      // independent of how fast the page itself just scrolled.
-      const autoSequence = { t: 0 };
-      gsap.to(autoSequence, {
-        t: targetOverallTime,
-        duration: videoDuration,
-        ease: 'none',
-        onUpdate: () => updateFrameRef.current(autoSequence.t),
-        onComplete: finishAutoScroll,
-      });
+      // Play the videos for real (sequential decoding = smooth, no skipped
+      // frames) at their natural speed, instead of compressing the whole
+      // timeline into a few seconds and seeking to every frame.
+      const logoVideo = logoVideoRef.current;
+      const heroVideo = heroVideoRef.current;
+      let rafId = 0;
+      let phase = 'logo';
+      let done = false;
+
+      const stopPlayback = () => {
+        cancelAnimationFrame(rafId);
+        logoVideo.removeEventListener('ended', onLogoEnded);
+        heroVideo.removeEventListener('ended', onHeroEnded);
+        logoVideo.pause();
+        heroVideo.pause();
+        logoVideo.playbackRate = 1;
+      };
+      const finish = () => {
+        if (done) return;
+        done = true;
+        stopPlayback();
+        updateFrameRef.current(totalDuration); // park at the end; scroll-scrub continues from here
+        finishAutoScroll();
+      };
+      const tick = () => {
+        const overall = phase === 'logo'
+          ? Math.min(logoVideo.currentTime / LOGO_SPEED, logoEffectiveDuration - 0.001)
+          : logoEffectiveDuration + heroVideo.currentTime;
+        updateFrameRef.current(overall, { seek: false });
+        rafId = requestAnimationFrame(tick);
+      };
+      const onLogoEnded = () => {
+        phase = 'hero';
+        if (heroVideo.readyState < 2 || !heroVideo.duration) { finish(); return; }
+        heroVideo.currentTime = 0;
+        heroVideo.playbackRate = 1;
+        heroVideo.play().catch(finish);
+      };
+      const onHeroEnded = () => finish();
+
+      seekersRef.current.logo?.cancel();
+      seekersRef.current.hero?.cancel();
+      logoVideo.addEventListener('ended', onLogoEnded);
+      heroVideo.addEventListener('ended', onHeroEnded);
+      logoVideo.currentTime = 0;
+      logoVideo.playbackRate = LOGO_SPEED;
+      logoVideo.play()
+        .then(() => { rafId = requestAnimationFrame(tick); })
+        .catch(() => {
+          // Playback blocked: fall back to the timed scrub at natural speed
+          stopPlayback();
+          const autoSequence = { t: 0 };
+          gsap.to(autoSequence, {
+            t: totalDuration,
+            duration: totalDuration,
+            ease: 'none',
+            onUpdate: () => updateFrameRef.current(autoSequence.t),
+            onComplete: finish,
+          });
+        });
+
+      // Safety net: never leave the hero in "autoplaying" state if 'ended' doesn't fire
+      setTimeout(finish, (totalDuration + 4) * 1000);
     };
 
     const handleWheel = (e) => {
@@ -342,16 +426,19 @@ const Hero = ({ onReady }) => {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [lenis, videosReady]);
+  }, [lenis, logoReady, heroReady]);
+
+  const currentHeroContent = contents[activeTextIndex];
+  const totalWordsCurrent = currentHeroContent
+    ? currentHeroContent.headingWords.length + currentHeroContent.paragraphWords.length
+    : 0;
+  const extrasVisible = showText && !isFinished && revealedWordCount >= totalWordsCurrent;
 
   return (
     <section ref={containerRef} id="home" className="relative w-full h-[400dvh] bg-black">
       {/* Sticky Container */}
       <div className="sticky top-0 left-0 w-full h-dvh overflow-hidden flex flex-col justify-center items-center">
-        {/* Hidden source videos — never displayed directly. Their frames
-            are drawn to the visible canvas below, seeked frame-by-frame via
-            currentTime as the person scrolls. Kept technically in the
-            layout (not display:none) so browsers don't suspend decoding. */}
+  
         <video
           ref={logoVideoRef}
           muted
@@ -388,10 +475,20 @@ const Hero = ({ onReady }) => {
                 display: inline-block;
                 animation: jova-word-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
               }
+              /* Same fade-in, but WITHOUT display:inline-block so flex layouts keep working */
+              .jova-fade {
+                animation: jova-word-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+              }
             `}</style>
             <div className={`transition-opacity duration-700 ease-in-out flex flex-col items-center text-center ${showText && !isFinished ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+              <p
+                className="text-metallic text-xs sm:text-sm font-semibold tracking-[0.35em] uppercase mb-4"
+                style={{ textShadow: '0 2px 6px rgba(0,0,0,0.8)' }}
+              >
+                Jova Metcraft
+              </p>
               <h1
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-[0.1em] uppercase mb-6 text-[#D4AF37]"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-[0.1em] uppercase mb-6 text-[#FF6B00]"
                 style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 4px 16px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.5)' }}
               >
                 {contents[activeTextIndex]?.headingWords.map((word, i) =>
@@ -402,7 +499,7 @@ const Hero = ({ onReady }) => {
                   ) : null
                 )}
               </h1>
-              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-wide text-white drop-shadow-md">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-light uppercase tracking-[0.14em] text-white drop-shadow-md">
                 {contents[activeTextIndex]?.paragraphWords.map((word, i) => {
                   const globalIndex = i + contents[activeTextIndex].headingWords.length;
                   return globalIndex < revealedWordCount ? (
@@ -412,9 +509,53 @@ const Hero = ({ onReady }) => {
                   ) : null;
                 })}
               </p>
+
+              {/* Capability strip, CTAs and process line only appear once
+                  the heading + tagline have fully finished revealing, so
+                  they don't compete with the word-by-word reveal above. */}
+              {extrasVisible && (
+                <div className="jova-fade flex flex-col items-center gap-5 sm:gap-6 mt-6 pb-4 w-full">
+                  <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 max-w-3xl text-[11px] sm:text-sm tracking-wide text-white/75 uppercase">
+                    {capabilityStrip.map((cap, i) => (
+                      <React.Fragment key={cap}>
+                        <span>{cap}</span>
+                        {i < capabilityStrip.length - 1 && (
+                          <span style={{ color: '#FF6B00' }}>|</span>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => openEnquiry('enquiry', lenis)}
+                      className="h-12 sm:h-14 inline-flex items-center justify-center gap-2 whitespace-nowrap px-7 rounded-full text-sm font-semibold uppercase tracking-wide transition-transform duration-200 hover:scale-105 box-border"
+                      style={{
+                        background: 'linear-gradient(145deg, #FF7A00, #FF6B00)',
+                        color: '#1a1310',
+                        boxShadow: '0 8px 24px rgba(255,107,0,0.4)'
+                      }}
+                    >
+                      Start a Project Enquiry
+                      <ArrowRight size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openEnquiry('upload', lenis)}
+                      className="h-12 sm:h-14 inline-flex items-center justify-center gap-2 whitespace-nowrap px-7 rounded-full text-sm font-semibold uppercase tracking-wide border border-white/40 text-white transition-colors duration-200 hover:border-[#FF6B00] hover:text-[#FF6B00] box-border"
+                    >
+                      <FileUp size={16} />
+                      Upload Drawings
+                    </button>
+                  </div>
+
+                  <HeroProcessLine active={extrasVisible} />
+                </div>
+              )}
             </div>
 
-            <div className="absolute bottom-8 md:bottom-12 animate-bounce text-white/50 block">
+            <div className={`absolute bottom-8 md:bottom-12 animate-bounce text-white/50 transition-opacity duration-500 ${extrasVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
               <span className="text-xs uppercase tracking-widest block mb-2">Scroll</span>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>

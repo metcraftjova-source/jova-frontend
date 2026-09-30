@@ -287,7 +287,7 @@ const MachinedPart = ({ clipPlane }) => {
 
       {/* Cyan-Blue Metallic paint pass (clipped) to match reference image */}
       <PartGeometries materialProps={{
-        color: "#38bdf8", // Icy metallic blue
+        color: "#FF6B00", // Jova signature orange
         metalness: 0.7,
         roughness: 0.15,
         clearcoat: 1.0,
@@ -409,7 +409,7 @@ const SprayGun = ({ gunRef, sprayRef }) => {
               <shaderMaterial
                 ref={innerMatRef}
                 uniforms={{
-                  color: { value: new THREE.Color("#38bdf8") },
+                  color: { value: new THREE.Color("#FF6B00") },
                   opacity: { value: 1.0 },
                   uTime: { value: 0 }
                 }}
@@ -537,7 +537,7 @@ export function PremiumCoatingScene({ disableAnimations = false, hideEnvironment
               const targetY = sliderY;
               cursor.style.transform = `translate(${startX + (targetX - startX) * ease}px, ${startY + (targetY - startY) * ease}px) scale(1)`;
               wheelRing.style.transform = `translate(-80px, 0px)`;
-              innerBall.style.boxShadow = '0 0 25px 8px #38bdf8';
+              innerBall.style.boxShadow = '0 0 25px 8px #FF6B00';
               innerBall.style.filter = 'grayscale(0%) brightness(100%)';
               if(blueSwatch) blueSwatch.style.filter = 'grayscale(0%) brightness(100%)';
               if(sliderContainer) sliderContainer.style.filter = 'grayscale(100%) brightness(50%)';
@@ -548,7 +548,7 @@ export function PremiumCoatingScene({ disableAnimations = false, hideEnvironment
               const thumbX = sliderWidth * (currentPercent / 100);
               cursor.style.transform = `translate(${sliderX + thumbX}px, ${sliderY}px) scale(0.9)`;
               wheelRing.style.transform = `translate(-80px, 0px)`;
-              innerBall.style.boxShadow = '0 0 25px 8px #38bdf8';
+              innerBall.style.boxShadow = '0 0 25px 8px #FF6B00';
               innerBall.style.filter = 'grayscale(0%) brightness(100%)';
               if(blueSwatch) blueSwatch.style.filter = 'grayscale(0%) brightness(100%)';
               if(sliderContainer) sliderContainer.style.filter = `grayscale(${100 - progress * 100}%) brightness(${50 + progress * 50}%)`;
@@ -559,7 +559,7 @@ export function PremiumCoatingScene({ disableAnimations = false, hideEnvironment
               const targetX = sliderX + (sliderWidth * 0.70);
               cursor.style.transform = `translate(${targetX + 20 * progress}px, ${sliderY + 20 * progress}px) scale(1)`;
               wheelRing.style.transform = `translate(-80px, 0px)`;
-              innerBall.style.boxShadow = '0 0 25px 8px #38bdf8';
+              innerBall.style.boxShadow = '0 0 25px 8px #FF6B00';
               innerBall.style.filter = 'grayscale(0%) brightness(100%)';
               if(blueSwatch) blueSwatch.style.filter = 'grayscale(0%) brightness(100%)';
               if(sliderContainer) sliderContainer.style.filter = 'grayscale(0%) brightness(100%)';
@@ -579,7 +579,7 @@ export function PremiumCoatingScene({ disableAnimations = false, hideEnvironment
               wheelRing.style.transform = `translate(${ -80 + 160 * progress }px, 0px)`;
               if(sliderThumb) sliderThumb.style.left = `${70 - 37 * progress}%`;
             } else {
-              innerBall.style.boxShadow = isSweeping ? '0 0 25px 8px #38bdf8' : 'none';
+              innerBall.style.boxShadow = isSweeping ? '0 0 25px 8px #FF6B00' : 'none';
               innerBall.style.filter = 'grayscale(0%) brightness(100%)';
               if(blueSwatch) blueSwatch.style.filter = 'grayscale(0%) brightness(100%)';
               if(sliderContainer) sliderContainer.style.filter = 'grayscale(0%) brightness(100%)';
@@ -737,7 +737,7 @@ export function PremiumCoatingScene({ disableAnimations = false, hideEnvironment
           cellColor="#1e293b"
           sectionSize={5}
           sectionThickness={1.5}
-          sectionColor="#38bdf8" // Cyan glow
+          sectionColor="#FF6B00" // Cyan glow
           fadeDistance={30}
           fadeStrength={1.5}
           position={[0, 0.01, 0]} // Slightly above floor

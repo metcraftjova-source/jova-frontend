@@ -16,6 +16,9 @@ const Home = lazy(() => import('./pages/Home'))
 const About = lazy(() => import('./pages/About'))
 const Product = lazy(() => import('./pages/Product'))
 const Services = lazy(() => import('./pages/Services'))
+const Projects = lazy(() => import('./pages/Projects'))
+const Industries = lazy(() => import('./pages/Industries'))
+const Quality = lazy(() => import('./pages/Quality'))
 const Contact = lazy(() => import('./pages/Contact'))
 
 
@@ -127,10 +130,16 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/Product" element={<Product />} />
-                <Route path="/services" element={<Services />} />
+                <Route path="/capabilities" element={<Services />} />
+                <Route path="/products" element={<Product />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/industries" element={<Industries />} />
+                <Route path="/quality" element={<Quality />} />
                 <Route path="/contact" element={<Contact />} />
 
+                {/* Legacy paths kept working in case they're bookmarked/linked elsewhere */}
+                <Route path="/Product" element={<Product />} />
+                <Route path="/services" element={<Services />} />
               </Routes>
             </Suspense>
             <Footer />
