@@ -173,14 +173,21 @@ const Hero = ({ onReady }) => {
 
     const onLogoData = () => primeAndMark(logoVideo, setLogoReady);
     const onHeroData = () => primeAndMark(heroVideo, setHeroReady);
-    loadAsBlob(logoVideoSrc, logoVideo, onLogoData, logoBlobUrlRef, logoVideoSrc);
-    loadAsBlob(homeHeroVideoSrc, heroVideo, onHeroData, heroBlobUrlRef, homeHeroVideoSrc);
+    // Load the logo intro first, then the hero video, so the two downloads
+    // don't compete for bandwidth on a first visit (the intro needs to be
+    // ready first anyway).
+    const onLogoDataThenHero = () => {
+      onLogoData();
+      if (cancelled) return;
+      loadAsBlob(homeHeroVideoSrc, heroVideo, onHeroData, heroBlobUrlRef, homeHeroVideoSrc);
+    };
+    loadAsBlob(logoVideoSrc, logoVideo, onLogoDataThenHero, logoBlobUrlRef, logoVideoSrc);
 
     return () => {
       cancelled = true;
       seekersRef.current.logo?.destroy();
       seekersRef.current.hero?.destroy();
-      logoVideo.removeEventListener('loadeddata', onLogoData);
+      logoVideo.removeEventListener('loadeddata', onLogoDataThenHero);
       heroVideo.removeEventListener('loadeddata', onHeroData);
       if (logoBlobUrlRef.current) { URL.revokeObjectURL(logoBlobUrlRef.current); logoBlobUrlRef.current = null; }
       if (heroBlobUrlRef.current) { URL.revokeObjectURL(heroBlobUrlRef.current); heroBlobUrlRef.current = null; }
