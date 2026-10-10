@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 /**
  * Replaces the old ImageSequence component (which drew hundreds of
@@ -14,6 +14,9 @@ import React, { useEffect, useRef } from 'react';
 const VideoLoop = ({ src, className = '', onProgress }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
+  // The video file is only requested once this component is near the screen,
+  // so it never delays the page's initial load.
+  const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -23,6 +26,7 @@ const VideoLoop = ({ src, className = '', onProgress }) => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          setShouldLoad(true);
           video.play().catch(() => {}); // autoplay can be blocked pre-interaction; harmless if so
         } else {
           video.pause();
@@ -46,8 +50,9 @@ const VideoLoop = ({ src, className = '', onProgress }) => {
     <div ref={containerRef} className={`relative ${className}`}>
       <video
         ref={videoRef}
-        src={src}
+        src={shouldLoad ? src : undefined}
         className="w-full h-full object-cover"
+        autoPlay
         muted
         loop
         playsInline
