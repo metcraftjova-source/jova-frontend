@@ -51,7 +51,7 @@ const VideoLoop = ({ src, className = '', onProgress }) => {
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
       />
     </div>
   );
