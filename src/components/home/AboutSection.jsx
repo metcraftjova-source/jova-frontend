@@ -182,7 +182,8 @@ const AboutSection = () => {
 
     video.muted = true;
     const tryPlay = () => video.play().catch(() => {});
-    tryPlay();
+    // Don't start playing (and downloading) on mount - the observer below
+    // starts it only when the video scrolls into view.
 
     const observer = new IntersectionObserver(
       ([entry]) => (entry.isIntersecting ? tryPlay() : video.pause()),
@@ -317,7 +318,7 @@ const AboutSection = () => {
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload="metadata"
                 className="absolute inset-0 w-full h-full object-cover"
               ></video>
             </div>
