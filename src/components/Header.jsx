@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import logoShield from '../assets/JM Logo Shield BGR.png';
+import logoShield from '../assets/JM Logo Shield BGR.webp';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

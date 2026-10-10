@@ -16,10 +16,10 @@ import {
 // pairs of cards below reuse the closest-fitting image as a placeholder.
 // Swap in dedicated photography per capability (e.g. an engineering/
 // drafting shot, an architectural interior shot) when available.
-import servicesFabrication from '../../assets/ServiceGrid/Steel Fabrication.png';
-import servicesErection from '../../assets/ServiceGrid/Shot Blasting.png';
-import servicesPeb from '../../assets/ServiceGrid/Industrial Painting & Coating.png';
-import servicesInfrastructure from '../../assets/ServiceGrid/Facade Solutions.png';
+import servicesFabrication from '../../assets/ServiceGrid/Steel Fabrication.webp';
+import servicesErection from '../../assets/ServiceGrid/Shot Blasting.webp';
+import servicesPeb from '../../assets/ServiceGrid/Industrial Painting & Coating.webp';
+import servicesInfrastructure from '../../assets/ServiceGrid/Facade Solutions.webp';
 
 const servicesList = [
   {

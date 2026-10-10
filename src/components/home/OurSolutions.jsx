@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import steelImage from '../../assets/steel_fabrication.png'; // Placeholder for card images
+import steelImage from '../../assets/steel_fabrication.webp'; // Placeholder for card images
 
 const solutionsData = [
   {

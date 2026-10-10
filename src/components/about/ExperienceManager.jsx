@@ -11,7 +11,7 @@ import { ReferenceBuilding } from './AboutHero';
 import { CNCMachine } from './FabricationProcess';
 import { BuildingStructure } from './BuildingFacade';
 import { PremiumCoatingScene } from './PremiumCoating';
-import facadeBg from '../../assets/facade_assembly.jpeg';
+import facadeBg from '../../assets/facade_assembly.webp';
 
 gsap.registerPlugin(ScrollTrigger);
 

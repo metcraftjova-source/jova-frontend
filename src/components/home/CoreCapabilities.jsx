@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ActiveCardDetails from './ActiveCardDetails';
 import { ScrollReveal } from './ScrollReveal';
-import imgSteelFabrication from '../../assets/CoreCapabilities/Steel Fabrication.png';
-import imgShotBlasting from '../../assets/CoreCapabilities/Shot Blasting.png';
-import imgIndustrialPainting from '../../assets/CoreCapabilities/Industrial Painting & Coating.png';
-import imgFacadeSolutions from '../../assets/CoreCapabilities/Facade Solutions.png';
+import imgSteelFabrication from '../../assets/CoreCapabilities/Steel Fabrication.webp';
+import imgShotBlasting from '../../assets/CoreCapabilities/Shot Blasting.webp';
+import imgIndustrialPainting from '../../assets/CoreCapabilities/Industrial Painting & Coating.webp';
+import imgFacadeSolutions from '../../assets/CoreCapabilities/Facade Solutions.webp';
 
 const capabilities = [
   {

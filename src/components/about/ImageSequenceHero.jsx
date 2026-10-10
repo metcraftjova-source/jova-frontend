@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import aboutHeroVideoSrc from '../../assets/about-hero.mp4';
+import aboutHeroVideoSrc from '../../assets/about-hero-opt.mp4';
 
 gsap.registerPlugin(ScrollTrigger);
 

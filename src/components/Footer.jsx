@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoFull from '../assets/JM Logo BGR.png';
+import logoFull from '../assets/JM Logo BGR.webp';
 
 const Footer = () => {
   return (

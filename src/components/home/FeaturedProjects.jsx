@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import steelImage from '../../assets/steel_fabrication.png'; // Placeholder for project images
+import steelImage from '../../assets/steel_fabrication.webp'; // Placeholder for project images
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';

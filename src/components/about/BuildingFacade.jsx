@@ -4,7 +4,7 @@ import { PBRMaterials } from '../../utils/materials';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Edges, Environment } from '@react-three/drei';
 import * as THREE from 'three';
-import facadeBg from '../../assets/facade_assembly.jpeg';
+import facadeBg from '../../assets/facade_assembly.webp';
 
 const W = 4.0;
 const H = 4.8;

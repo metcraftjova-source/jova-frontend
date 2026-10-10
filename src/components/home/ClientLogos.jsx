@@ -6,11 +6,11 @@ import ionExchangeLogo from '../../assets/ClientLogo/IonExchange-logo.svg';
 import lwLogo from '../../assets/ClientLogo/LW-logo.svg';
 import mersenLogo from '../../assets/ClientLogo/Mersen-logo.png';
 import propelLogo from '../../assets/ClientLogo/Propel-logo.svg';
-import rigidfabLogo from '../../assets/ClientLogo/rigidfab-logo.jpeg';
+import rigidfabLogo from '../../assets/ClientLogo/rigidfab-logo.webp';
 import southernLogo from '../../assets/ClientLogo/Southern-logo.svg';
 import spLogo from '../../assets/ClientLogo/SP-logo.svg';
 import terexLogo from '../../assets/ClientLogo/Terex-logo-new.png';
-import wegLogo from '../../assets/ClientLogo/Weg-logo-new.png';
+import wegLogo from '../../assets/ClientLogo/Weg-logo-new.webp';
 import { ScrollReveal } from './ScrollReveal';
 
 const logos = [

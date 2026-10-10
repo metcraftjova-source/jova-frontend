@@ -6,7 +6,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Edges, Environment } from '@react-three/drei';
 
 import * as THREE from 'three';
-import aboutVideo from '../../assets/WinChamp_CNC_Laser_Cutting_Machine_High-Speed_Precision_Fiber_Laser_by_Winarc.mp4';
+import aboutVideo from '../../assets/winchamp-opt.mp4';
 
 gsap.registerPlugin(ScrollTrigger);
 
