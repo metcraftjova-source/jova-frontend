@@ -105,8 +105,8 @@ function App() {
 
     // Safety net: if the hero video somehow never becomes ready (blocked
     // asset, very slow/broken connection), don't leave the visitor stuck
-    // on the loading screen forever — reveal the page after 6s regardless.
-    const failSafe = setTimeout(() => setHeroReady(true), 6000);
+    // on the loading screen forever — reveal the page after 12s regardless.
+    const failSafe = setTimeout(() => setHeroReady(true), 12000);
 
     return () => {
       window.removeEventListener('jova-hero-ready', handleReady);
